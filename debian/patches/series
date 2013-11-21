@@ -1,0 +1,4 @@
+perl-use-dpkg-buildflags.patch
+uri_segfault_fix_LP1065555.patch
+cve-2013-2070.patch
+cve-2013-4547.patch
