@@ -1,6 +1,9 @@
 nginx (1.4.4-0pexip1) pexip; urgency=low
 
   * Imported Upstream version 1.4.4
+  * Updated plugins to 1.4.4-4ubuntu1
+  * Remove image filter
+  * Add ldap module
 
  -- Alan Ford <alan@pexip.com>  Wed, 22 Jan 2014 18:17:54 +0000
 
