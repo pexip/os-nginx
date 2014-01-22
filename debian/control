@@ -1,9 +1,10 @@
 Source: nginx
 Section: httpd
 Priority: optional
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Maintainer: Pexip AS <packaging@pexip.com>
+XSBC-Pexip-Original-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 XSBC-Original-Maintainer: Kartik Mistry <kartik@debian.org>
-Uploaders: Jose Parrella <bureado@debian.org>,
+XSBC-Pexip-Original-Uploaders: Jose Parrella <bureado@debian.org>,
            Fabio Tranchitella <kobold@debian.org>,
            Michael Lustfield <michael@lustfield.net>,
            Dmitry E. Oboukhov <unera@debian.org>,
@@ -26,6 +27,7 @@ Standards-Version: 3.9.3
 Homepage: http://nginx.net
 Vcs-Svn: svn://svn.debian.org/svn/collab-maint/deb-maint/nginx/trunk
 Vcs-Browser: http://svn.debian.org/wsvn/collab-maint/deb-maint/nginx/trunk
+XS-Pexip-Upstream: http://archive.ubuntu.com/ubuntu/ precise
 
 Package: nginx
 Architecture: all
