@@ -67,13 +67,14 @@ config.status.full: config.env.full config.sub config.guess
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-pcre-jit \
 	    --with-debug \
 	    --with-http_addition_module \
 	    --with-http_dav_module \
 	    --with-http_geoip_module \
 	    --with-http_gzip_static_module \
-	    --with-http_image_filter_module \
 	    --with-http_realip_module \
+            --with-http_spdy_module \
 	    --with-http_stub_status_module \
 	    --with-http_ssl_module \
 	    --with-http_sub_module \
@@ -87,6 +88,7 @@ config.status.full: config.env.full config.sub config.guess
 	    --add-module=$(MODULESDIR)/nginx-echo \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
+	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
@@ -101,6 +103,7 @@ config.status.light: config.env.light config.sub config.guess
 	    --http-proxy-temp-path=/var/lib/nginx/proxy \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-pcre-jit \
 	    --with-http_gzip_static_module \
 	    --with-http_ssl_module \
 	    --with-ipv6 \
@@ -133,18 +136,19 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-pcre-jit \
 	    --with-debug \
 	    --with-http_addition_module \
 	    --with-http_dav_module \
 	    --with-http_flv_module \
 	    --with-http_geoip_module \
 	    --with-http_gzip_static_module \
-	    --with-http_image_filter_module \
 	    --with-http_mp4_module \
 	    --with-http_perl_module \
 	    --with-http_random_index_module \
 	    --with-http_realip_module \
 	    --with-http_secure_link_module \
+            --with-http_spdy_module \
 	    --with-http_stub_status_module \
 	    --with-http_ssl_module \
 	    --with-http_sub_module \
@@ -154,17 +158,18 @@ config.status.extras: config.env.extras config.sub config.guess
 	    --with-md5=/usr/include/openssl \
 	    --with-mail \
 	    --with-mail_ssl_module \
-	    --add-module=$(MODULESDIR)/nginx-auth-pam \
-	    --add-module=$(MODULESDIR)/chunkin-nginx-module \
 	    --add-module=$(MODULESDIR)/headers-more-nginx-module \
+	    --add-module=$(MODULESDIR)/nginx-auth-pam \
+	    --add-module=$(MODULESDIR)/nginx-cache-purge \
+	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
 	    --add-module=$(MODULESDIR)/nginx-development-kit \
 	    --add-module=$(MODULESDIR)/nginx-echo \
+	    --add-module=$(MODULESDIR)/ngx-fancyindex \
 	    --add-module=$(MODULESDIR)/nginx-http-push \
 	    --add-module=$(MODULESDIR)/nginx-lua \
-	    --add-module=$(MODULESDIR)/nginx-upload-module \
 	    --add-module=$(MODULESDIR)/nginx-upload-progress \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
-	    --add-module=$(MODULESDIR)/nginx-dav-ext-module \
+	    --add-module=$(MODULESDIR)/ngx_http_substitutions_filter_module \
             $(CONFIGURE_OPTS) >$@
 	touch $@
 
@@ -181,6 +186,7 @@ config.status.naxsi: config.env.naxsi config.sub config.guess
 	    --http-uwsgi-temp-path=/var/lib/nginx/uwsgi \
 	    --lock-path=/var/lock/nginx.lock \
 	    --pid-path=/var/run/nginx.pid \
+	    --with-pcre-jit \
 	    --with-http_ssl_module \
 	    --without-mail_pop3_module \
 	    --without-mail_smtp_module \
@@ -188,6 +194,8 @@ config.status.naxsi: config.env.naxsi config.sub config.guess
 	    --without-http_uwsgi_module \
 	    --without-http_scgi_module \
 	    --with-ipv6 \
+	    --with-http_stub_status_module \
+	    --with-http_realip_module \
 	    --add-module=$(MODULESDIR)/nginx-upstream-fair \
 	    --add-module=$(MODULESDIR)/nginx-cache-purge \
 	    --add-module=$(MODULESDIR)/naxsi/naxsi_src \

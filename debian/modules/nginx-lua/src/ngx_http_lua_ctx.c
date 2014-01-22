@@ -1,8 +1,16 @@
+
+/*
+ * Copyright (C) Yichun Zhang (agentzh)
+ */
+
+
 #ifndef DDEBUG
 #define DDEBUG 0
 #endif
 #include "ddebug.h"
 
+
+#include "ngx_http_lua_util.h"
 #include "ngx_http_lua_ctx.h"
 
 
@@ -12,7 +20,8 @@ ngx_http_lua_ngx_get_ctx(lua_State *L)
     ngx_http_request_t          *r;
     ngx_http_lua_ctx_t          *ctx;
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
 
@@ -27,21 +36,23 @@ ngx_http_lua_ngx_get_ctx(lua_State *L)
 
     if (ctx->ctx_ref == LUA_NOREF) {
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                "lua create ngx.ctx table for the current request");
+                       "lua create ngx.ctx table for the current request");
 
-        lua_getfield(L, LUA_REGISTRYINDEX, NGX_LUA_REQ_CTX_REF);
+        lua_pushlightuserdata(L, &ngx_http_lua_ctx_tables_key);
+        lua_rawget(L, LUA_REGISTRYINDEX);
         lua_newtable(L);
         lua_pushvalue(L, -1);
         ctx->ctx_ref = luaL_ref(L, -3);
         return 1;
-
-    } else {
-        ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                "lua fetching existing ngx.ctx table for the current request");
-
-        lua_getfield(L, LUA_REGISTRYINDEX, NGX_LUA_REQ_CTX_REF);
-        lua_rawgeti(L, -1, ctx->ctx_ref);
     }
+
+    ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "lua fetching existing ngx.ctx table for the current "
+                   "request");
+
+    lua_pushlightuserdata(L, &ngx_http_lua_ctx_tables_key);
+    lua_rawget(L, LUA_REGISTRYINDEX);
+    lua_rawgeti(L, -1, ctx->ctx_ref);
 
     return 1;
 }
@@ -53,7 +64,8 @@ ngx_http_lua_ngx_set_ctx(lua_State *L)
     ngx_http_request_t          *r;
     ngx_http_lua_ctx_t          *ctx;
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
 
@@ -80,9 +92,10 @@ ngx_http_lua_ngx_set_ctx_helper(lua_State *L, ngx_http_request_t *r,
 
     if (ctx->ctx_ref == LUA_NOREF) {
         ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                "lua create ngx.ctx table for the current request");
+                       "lua create ngx.ctx table for the current request");
 
-        lua_getfield(L, LUA_REGISTRYINDEX, NGX_LUA_REQ_CTX_REF);
+        lua_pushlightuserdata(L, &ngx_http_lua_ctx_tables_key);
+        lua_rawget(L, LUA_REGISTRYINDEX);
         lua_pushvalue(L, index);
         ctx->ctx_ref = luaL_ref(L, -2);
         lua_pop(L, 1);
@@ -90,9 +103,11 @@ ngx_http_lua_ngx_set_ctx_helper(lua_State *L, ngx_http_request_t *r,
     }
 
     ngx_log_debug0(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-            "lua fetching existing ngx.ctx table for the current request");
+                   "lua fetching existing ngx.ctx table for the current "
+                   "request");
 
-    lua_getfield(L, LUA_REGISTRYINDEX, NGX_LUA_REQ_CTX_REF);
+    lua_pushlightuserdata(L, &ngx_http_lua_ctx_tables_key);
+    lua_rawget(L, LUA_REGISTRYINDEX);
     luaL_unref(L, -1, ctx->ctx_ref);
     lua_pushvalue(L, index);
     ctx->ctx_ref = luaL_ref(L, -2);
@@ -101,3 +116,4 @@ ngx_http_lua_ngx_set_ctx_helper(lua_State *L, ngx_http_request_t *r,
     return 0;
 }
 
+/* vi:set ft=c ts=4 sw=4 et fdm=marker: */

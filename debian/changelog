@@ -1,3 +1,9 @@
+nginx (1.4.4-0pexip1) pexip; urgency=low
+
+  * Imported Upstream version 1.4.4
+
+ -- Alan Ford <alan@pexip.com>  Wed, 22 Jan 2014 18:17:54 +0000
+
 nginx (1.1.19-1ubuntu0.5pexip1) pexip; urgency=low
 
   * Prepare Pexip packaging

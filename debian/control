@@ -13,7 +13,6 @@ Build-Depends: autotools-dev,
                debhelper (>= 7),
                dpkg-dev (>= 1.15.7),
                libexpat-dev,
-               libgd2-noxpm-dev,
                libgeoip-dev,
                liblua5.1-dev,
                libmhash-dev,
@@ -93,8 +92,8 @@ Description: nginx web server with full set of core modules
    Geo, Gzip, Headers, Index, Limit Requests, Limit Zone, Log, Map, Memcached,
    Proxy, Referer, Rewrite, SCGI, Split Clients, SSI, Upstream, User ID, UWSGI
  Optional HTTP Modules:
-   Addition, Debug, GeoIP, Gzip Precompression, HTTP Sub, Image Filter, IPv6,
-   RealIP, Stub Status, WebDAV, XSLT
+   Addition, Debug, GeoIP, Gzip Precompression, HTTP Sub, IPv6, RealIP, 
+   Stub Status, WebDAV, XSLT
  Mail Modules:
    Mail Core, IMAP, POP3, SMTP, SSL
  Third Party Modules:

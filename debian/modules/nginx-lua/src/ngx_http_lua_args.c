@@ -1,14 +1,20 @@
+
+/*
+ * Copyright (C) Xiaozhe Wang (chaoslawful)
+ * Copyright (C) Yichun Zhang (agentzh)
+ */
+
+
 #ifndef DDEBUG
 #define DDEBUG 0
 #endif
 #include "ddebug.h"
 
+
 #include "ngx_http_lua_args.h"
 #include "ngx_http_lua_util.h"
 
 
-static int ngx_http_lua_parse_args(ngx_http_request_t *r, lua_State *L,
-    u_char *buf, u_char *last, int max);
 static int ngx_http_lua_ngx_req_set_uri_args(lua_State *L);
 static int ngx_http_lua_ngx_req_get_uri_args(lua_State *L);
 static int ngx_http_lua_ngx_req_get_post_args(lua_State *L);
@@ -24,16 +30,19 @@ ngx_http_lua_ngx_req_set_uri_args(lua_State *L) {
 
     if (lua_gettop(L) != 1) {
         return luaL_error(L, "expecting 1 argument but seen %d",
-                lua_gettop(L));
+                          lua_gettop(L));
     }
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
 
     if (r == NULL) {
         return luaL_error(L, "no request object found");
     }
+
+    ngx_http_lua_check_fake_request(L, r);
 
     switch (lua_type(L, 1)) {
     case LUA_TNUMBER:
@@ -59,7 +68,7 @@ ngx_http_lua_ngx_req_set_uri_args(lua_State *L) {
 
     default:
         msg = lua_pushfstring(L, "string, number, or table expected, "
-                "but got %s", luaL_typename(L, 2));
+                              "but got %s", luaL_typename(L, 2));
         return luaL_argerror(L, 1, msg);
     }
 
@@ -97,13 +106,16 @@ ngx_http_lua_ngx_req_get_uri_args(lua_State *L) {
         max = NGX_HTTP_LUA_MAX_ARGS;
     }
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
 
     if (r == NULL) {
         return luaL_error(L, "no request object found");
     }
+
+    ngx_http_lua_check_fake_request(L, r);
 
     lua_createtable(L, 0, 4);
 
@@ -154,7 +166,8 @@ ngx_http_lua_ngx_req_get_post_args(lua_State *L)
         max = NGX_HTTP_LUA_MAX_ARGS;
     }
 
-    lua_getglobal(L, GLOBALS_SYMBOL_REQUEST);
+    lua_pushlightuserdata(L, &ngx_http_lua_request_key);
+    lua_rawget(L, LUA_GLOBALSINDEX);
     r = lua_touserdata(L, -1);
     lua_pop(L, 1);
 
@@ -162,14 +175,16 @@ ngx_http_lua_ngx_req_get_post_args(lua_State *L)
         return luaL_error(L, "no request object found");
     }
 
+    ngx_http_lua_check_fake_request(L, r);
+
     if (r->discard_body) {
-        lua_createtable(L, 0, 4);
+        lua_createtable(L, 0, 0);
         return 1;
     }
 
     if (r->request_body == NULL) {
         return luaL_error(L, "no request body found; "
-                "maybe you should turn on lua_need_request_body?");
+                          "maybe you should turn on lua_need_request_body?");
     }
 
     if (r->request_body->temp_file) {
@@ -214,7 +229,7 @@ ngx_http_lua_ngx_req_get_post_args(lua_State *L)
 }
 
 
-static int
+int
 ngx_http_lua_parse_args(ngx_http_request_t *r, lua_State *L, u_char *buf,
         u_char *last, int max)
 {
@@ -223,6 +238,9 @@ ngx_http_lua_parse_args(ngx_http_request_t *r, lua_State *L, u_char *buf,
     unsigned                     parsing_value;
     size_t                       len;
     int                          count = 0;
+    int                          top;
+
+    top = lua_gettop(L);
 
     p = buf;
 
@@ -236,7 +254,7 @@ ngx_http_lua_parse_args(ngx_http_request_t *r, lua_State *L, u_char *buf,
             src = q; dst = q;
 
             ngx_http_lua_unescape_uri(&dst, &src, p - q,
-                    NGX_UNESCAPE_URI_COMPONENT);
+                                      NGX_UNESCAPE_URI_COMPONENT);
 
             dd("pushing key %.*s", (int) (dst - q), q);
 
@@ -254,7 +272,7 @@ ngx_http_lua_parse_args(ngx_http_request_t *r, lua_State *L, u_char *buf,
             src = q; dst = q;
 
             ngx_http_lua_unescape_uri(&dst, &src, p - q,
-                    NGX_UNESCAPE_URI_COMPONENT);
+                                      NGX_UNESCAPE_URI_COMPONENT);
 
             dd("pushing key or value %.*s", (int) (dst - q), q);
 
@@ -287,12 +305,12 @@ ngx_http_lua_parse_args(ngx_http_request_t *r, lua_State *L, u_char *buf,
 
             } else {
                 dd("setting table...");
-                ngx_http_lua_set_multi_value_table(L, 1);
+                ngx_http_lua_set_multi_value_table(L, top);
             }
 
             if (max > 0 && ++count == max) {
                 ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                        "lua hit query args limit %d", max);
+                               "lua hit query args limit %d", max);
 
                 return 1;
             }
@@ -306,13 +324,13 @@ ngx_http_lua_parse_args(ngx_http_request_t *r, lua_State *L, u_char *buf,
         src = q; dst = q;
 
         ngx_http_lua_unescape_uri(&dst, &src, p - q,
-                NGX_UNESCAPE_URI_COMPONENT);
+                                  NGX_UNESCAPE_URI_COMPONENT);
 
         dd("pushing key or value %.*s", (int) (dst - q), q);
 
         lua_pushlstring(L, (char *) q, dst - q);
 
-        if (! parsing_value) {
+        if (!parsing_value) {
             dd("pushing boolean true...");
             lua_pushboolean(L, 1);
         }
@@ -326,14 +344,14 @@ ngx_http_lua_parse_args(ngx_http_request_t *r, lua_State *L, u_char *buf,
 
         } else {
             dd("setting table...");
-            ngx_http_lua_set_multi_value_table(L, 1);
+            ngx_http_lua_set_multi_value_table(L, top);
         }
     }
 
     dd("gettop: %d", lua_gettop(L));
     dd("type: %s", lua_typename(L, lua_type(L, 1)));
 
-    if (lua_gettop(L) != 1) {
+    if (lua_gettop(L) != top) {
         return luaL_error(L, "internal error: stack in bad state");
     }
 
@@ -357,3 +375,4 @@ ngx_http_lua_inject_req_args_api(lua_State *L)
     lua_setfield(L, -2, "get_post_args");
 }
 
+/* vi:set ft=c ts=4 sw=4 et fdm=marker: */

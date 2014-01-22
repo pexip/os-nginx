@@ -6,7 +6,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * In addition, as a special exception, the copyright holders give
  * permission to link the code of portions of this program with the
  * OpenSSL library under certain conditions as described in each
@@ -18,8 +18,8 @@
  * version of the file(s), but you are not obligated to do so.  If you
  * do not wish to do so, delete this exception statement from your
  * version.  If you delete this exception statement from all source
- * files in the program, then also delete it here. 
- *
+ * files in the program, then also delete it here.
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -79,6 +79,28 @@ strfaststr(unsigned char *haystack, unsigned int hl,
     }
   return (NULL);
 }
+
+/* unescape routine, returns number of nullbytes present */
+int naxsi_unescape(ngx_str_t *str) {
+  u_char *dst, *src;
+  u_int nullbytes = 0, i;
+  
+  dst = str->data;
+  src = str->data;
+      
+  naxsi_unescape_uri(&src, &dst,
+		     str->len, 0);      
+  str->len =  src - str->data;
+  //tmp hack fix, avoid %00 & co (null byte) encoding :p
+  for (i = 0; i < str->len; i++)
+    if (str->data[i] == 0x0)
+      {
+	nullbytes++;
+	str->data[i] = '0';
+      }
+  return (nullbytes);
+}
+
 
 /*
 ** Patched ngx_unescape_uri : 
@@ -276,13 +298,15 @@ ngx_http_wlr_merge(ngx_conf_t *cf, ngx_http_whitelist_rule_t *father_wl,
   location index refers to $URL:bla or $ARGS_VAR:bla */
 #define custloc_array(x) ((ngx_http_custom_rule_location_t *) x)
 
+//#define whitelist_heavy_debug
+
 ngx_int_t 
 ngx_http_wlr_identify(ngx_conf_t *cf, ngx_http_dummy_loc_conf_t *dlc, 
 		      ngx_http_rule_t *curr, int *zone,
 		      int *uri_idx, int *name_idx) {
   
   uint	i;
-
+  
   /*
     identify global match zones (|ARGS|BODY|HEADERS|URL|FILE_EXT)
    */
@@ -589,10 +613,10 @@ ngx_http_dummy_create_hashtables_n(ngx_http_dummy_loc_conf_t *dlc,
   int				zone, uri_idx, name_idx, ret;
   ngx_http_rule_t		*curr_r/*, *father_r*/;
   ngx_http_whitelist_rule_t	*father_wlr;
-  unsigned char			*fullname;
+  char			*fullname;
   uint	i;
 
-  if (!dlc->whitelist_rules || dlc->whitelist_rules->nelts < 1) {
+  if (!dlc->whitelist_rules  || dlc->whitelist_rules->nelts < 1) {
 #ifdef whitelist_heavy_debug    
     ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
 		       "No whitelist registred, but it's your call.");    
@@ -629,9 +653,26 @@ ngx_http_dummy_create_hashtables_n(ngx_http_dummy_loc_conf_t *dlc,
     if (ret != NGX_OK)
       {
 	ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, 
-			   "naxsi internal error in wlr_identify.");
+			   "Following whitelist doesn't target any zone or is incorrect :");
+	if (name_idx != -1)
+	  ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "whitelist target name : %V", 
+			     &(custloc_array(curr_r->br->custom_locations->elts)[name_idx].target));
+	else
+	  ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "whitelist has no target name.");
+	if (uri_idx != -1)
+	  ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "whitelist target uri : %V", 
+			     &(custloc_array(curr_r->br->custom_locations->elts)[uri_idx].target));
+	else
+	  ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "whitelists has no target uri.");
 	return (NGX_ERROR);
       }
+    /*
+      ngx_http_whitelist_rule_t *
+      ngx_http_wlr_find(ngx_conf_t *cf, ngx_http_dummy_loc_conf_t *dlc,
+      ngx_http_rule_t *curr, int zone, int uri_idx,
+      int name_idx, char **fullname) {
+      
+    */
     father_wlr = ngx_http_wlr_find(cf, dlc, curr_r, zone, uri_idx, name_idx, (char **) &fullname);
     if (!father_wlr) {
 #ifdef whitelist_heavy_debug
@@ -649,7 +690,7 @@ ngx_http_dummy_create_hashtables_n(ngx_http_dummy_loc_conf_t *dlc,
       if (!father_wlr->name)
 	return (NGX_ERROR);
       father_wlr->name->len = strlen((const char *) fullname);
-      father_wlr->name->data = fullname;
+      father_wlr->name->data = (unsigned char *) fullname;
       father_wlr->zone = zone;
       /* If there is URI and no name idx, specify it,
 	 so that WL system won't get fooled by an argname like an URL */
@@ -671,3 +712,67 @@ ngx_http_dummy_create_hashtables_n(ngx_http_dummy_loc_conf_t *dlc,
   return (NGX_OK);
 }
 
+/*
+  function used for intensive log if dynamic flag is set.
+  Output format :
+  ip=<ip>&server=<server>&uri=<uri>&id=<id>&zone=<zone>&content=<content>
+ */
+
+static char *dummy_match_zones[] = {
+  "HEADERS",
+  "URL",
+  "ARGS",
+  "BODY",
+  "FILE_EXT",
+  "UNKNOWN",
+  NULL
+};
+
+
+void naxsi_log_offending(ngx_str_t *name, ngx_str_t *val, ngx_http_request_t *req, ngx_http_rule_t *rule,
+			 enum DUMMY_MATCH_ZONE	zone) {
+  ngx_str_t			tmp_uri, tmp_val, tmp_name;
+  ngx_str_t			empty=ngx_string("");
+  
+  //encode uri
+  tmp_uri.len = req->uri.len + (2 * ngx_escape_uri(NULL, req->uri.data, req->uri.len,
+						   NGX_ESCAPE_ARGS));
+  tmp_uri.data = ngx_pcalloc(req->pool, tmp_uri.len+1);
+  if (tmp_uri.data == NULL)
+    return ;
+  ngx_escape_uri(tmp_uri.data, req->uri.data, req->uri.len, NGX_ESCAPE_ARGS);
+  //encode val
+  if (val->len <= 0)
+    tmp_val = empty;
+  else {
+    tmp_val.len = val->len + (2 * ngx_escape_uri(NULL, val->data, val->len,
+						 NGX_ESCAPE_ARGS));
+    tmp_val.data = ngx_pcalloc(req->pool, tmp_val.len+1);
+    if (tmp_val.data == NULL)
+      return ;
+    ngx_escape_uri(tmp_val.data, val->data, val->len, NGX_ESCAPE_ARGS);
+  }
+  //encode name
+  if (name->len <= 0)
+    tmp_name = empty;
+  else {
+    tmp_name.len = name->len + (2 * ngx_escape_uri(NULL, name->data, name->len,
+						   NGX_ESCAPE_ARGS));
+    tmp_name.data = ngx_pcalloc(req->pool, tmp_name.len+1);
+    if (tmp_name.data == NULL)
+      return ;
+    ngx_escape_uri(tmp_name.data, name->data, name->len, NGX_ESCAPE_ARGS);
+  }
+  
+  ngx_log_debug(NGX_LOG_ERR, req->connection->log, 0, 
+		"NAXSI_EXLOG: ip=%V&server=%V&uri=%V&id=%d&zone=%s&var_name=%V&content=%V", 
+		&(req->connection->addr_text), &(req->headers_in.server),
+		&(tmp_uri), rule->rule_id, dummy_match_zones[zone], &(tmp_name), &(tmp_val));
+  if (tmp_val.len > 0)
+    ngx_pfree(req->pool, tmp_val.data);
+  if (tmp_name.len > 0)
+    ngx_pfree(req->pool, tmp_name.data);
+  if (tmp_uri.len > 0)
+    ngx_pfree(req->pool, tmp_uri.data);
+  
+}

@@ -1,8 +1,15 @@
+
+/*
+ * Copyright (C) Xiaozhe Wang (chaoslawful)
+ * Copyright (C) Yichun Zhang (agentzh)
+ */
+
+
 #ifndef DDEBUG
 #define DDEBUG 0
 #endif
-
 #include "ddebug.h"
+
 
 #include "ngx_http_lua_consts.h"
 
@@ -20,8 +27,14 @@ ngx_http_lua_inject_core_consts(lua_State *L)
     lua_pushinteger(L, NGX_DONE);
     lua_setfield(L, -2, "DONE");
 
+    lua_pushinteger(L, NGX_DECLINED);
+    lua_setfield(L, -2, "DECLINED");
+
     lua_pushinteger(L, NGX_ERROR);
     lua_setfield(L, -2, "ERROR");
+
+    lua_pushlightuserdata(L, NULL);
+    lua_setfield(L, -2, "null");
     /* }}} */
 }
 
@@ -39,11 +52,15 @@ ngx_http_lua_inject_http_consts(lua_State *L)
     lua_pushinteger(L, NGX_HTTP_PUT);
     lua_setfield(L, -2, "HTTP_PUT");
 
+    lua_pushinteger(L, NGX_HTTP_HEAD);
+    lua_setfield(L, -2, "HTTP_HEAD");
+
     lua_pushinteger(L, NGX_HTTP_DELETE);
     lua_setfield(L, -2, "HTTP_DELETE");
 
-    lua_pushinteger(L, NGX_HTTP_HEAD);
-    lua_setfield(L, -2, "HTTP_HEAD");
+    lua_pushinteger(L, NGX_HTTP_OPTIONS);
+    lua_setfield(L, -2, "HTTP_OPTIONS");
+    /* }}} */
 
     lua_pushinteger(L, NGX_HTTP_OK);
     lua_setfield(L, -2, "HTTP_OK");
@@ -101,3 +118,4 @@ ngx_http_lua_inject_http_consts(lua_State *L)
     /* }}} */
 }
 
+/* vi:set ft=c ts=4 sw=4 et fdm=marker: */

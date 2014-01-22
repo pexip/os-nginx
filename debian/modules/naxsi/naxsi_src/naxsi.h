@@ -6,7 +6,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * In addition, as a special exception, the copyright holders give
  * permission to link the code of portions of this program with the
  * OpenSSL library under certain conditions as described in each
@@ -18,8 +18,8 @@
  * version of the file(s), but you are not obligated to do so.  If you
  * do not wish to do so, delete this exception statement from your
  * version.  If you delete this exception statement from all source
- * files in the program, then also delete it here. 
- *
+ * files in the program, then also delete it here.
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,7 +32,7 @@
 #ifndef __FOO_H__
 #define __FOO_H__
 
-#define NAXSI_VERSION "0.45"
+#define NAXSI_VERSION "0.50"
 
 #include <nginx.h>
 #include <ngx_config.h>
@@ -80,13 +80,6 @@ enum DUMMY_MATCH_ZONE {
   UNKNOWN
 };
 
-
-/* internal FLAG rule */
-typedef struct
-{
-  ngx_flag_t	weird_request:1;
-  ngx_flag_t	big_body:1;
-} ngx_http_flag_rule_t;
 
 /*
 ** struct used to store a specific match zone
@@ -228,6 +221,9 @@ typedef struct
 {
   ngx_str_t	*sc_tag;
   ngx_int_t	sc_score;
+  ngx_flag_t	block:1;
+  ngx_flag_t	allow:1;
+  ngx_flag_t	log:1;
 } ngx_http_special_score_t;
 
 /*
@@ -242,7 +238,7 @@ typedef struct
   ngx_int_t	cmp;
   ngx_flag_t	block:1;
   ngx_flag_t	allow:1;
-  //ngx_flag_t	log:1;  /*unused*/
+  ngx_flag_t	log:1;
 } ngx_http_check_rule_t;
 
 /* TOP level rule structure */
@@ -257,19 +253,21 @@ typedef struct
   ngx_int_t			rule_id;
   ngx_str_t			*log_msg; // a specific log message
   ngx_int_t			score; //also handles DENY and ALLOW
-  // bellow, specific score tag stuff
-  ngx_str_t			*sc_tag; //specific score tag
-  ngx_int_t			sc_score;  //specific score value
+  
+  /* List of scores increased on rule match. */
+  ngx_array_t			*sscores;
+  /*ngx_str_t			*sc_tag; //specific score tag
+    ngx_int_t			sc_score;  //specific score value*/
   ngx_flag_t			sc_block:1; //
   ngx_flag_t			sc_allow:1; //
   // end of specific score tag stuff
   ngx_flag_t			block:1;
   ngx_flag_t			allow:1;
+  ngx_flag_t			log:1;
   /* flag set if we're linked FROM or TO another rule  */
   ngx_flag_t			lnk_to:1;
   ngx_flag_t			lnk_from:1;
   /* pointers on specific rule stuff */
-  ngx_http_flag_rule_t		*fr;
   ngx_http_basic_rule_t		*br;
 } ngx_http_rule_t;
 
@@ -281,6 +279,7 @@ typedef struct
   ngx_array_t	*generic_rules; 
   ngx_array_t	*locations; /*ngx_http_dummy_loc_conf_t*/
   ngx_log_t	*log;
+  
 } ngx_http_dummy_main_conf_t;
 
 
@@ -308,15 +307,23 @@ typedef struct
   ngx_array_t	*disabled_rules;
   /* counters for both processed requests and
      blocked requests, used in naxsi_fmt */
-  ngx_int_t	request_processed;
-  ngx_int_t	request_blocked;
+  size_t	request_processed;
+  size_t	request_blocked;
   ngx_int_t	error;
   ngx_array_t	*persistant_data;
+  ngx_flag_t	extensive:1;
   ngx_flag_t	learning:1;
   ngx_flag_t	enabled:1;
   ngx_flag_t	force_disabled:1;
   ngx_flag_t	pushed:1;
   ngx_str_t	*denied_url;
+  /* precomputed hash for dynamic variable lookup, 
+     variable themselves are boolean */
+  ngx_uint_t	flag_enable_h;
+  ngx_uint_t	flag_learning_h;
+  ngx_uint_t	flag_post_action_h;
+  ngx_uint_t	flag_extensive_log_h;
+  
 } ngx_http_dummy_loc_conf_t;
 
 
@@ -333,6 +340,11 @@ typedef struct
   ngx_flag_t		args_var:1;
   /* matched on URL */
   ngx_flag_t		url:1;
+  /* matched in filename [name] of args*/
+  ngx_flag_t		file_ext:1;
+  /* matched within the 'NAME' */
+  ngx_flag_t		target_name:1;
+  
   ngx_str_t		*name;
   ngx_http_rule_t	*rule;
 } ngx_http_matched_rule_t;
@@ -344,18 +356,25 @@ typedef struct
 {
   ngx_array_t	*special_scores;
   ngx_int_t	score;
-  // blocking flags
+  /* blocking flags */
+  ngx_flag_t	log:1;
   ngx_flag_t	block:1;
   ngx_flag_t	allow:1;
-  // state
+  /* state */
   ngx_flag_t	wait_for_body:1;
   ngx_flag_t	ready:1;
   ngx_flag_t	over:1;
-  // flag request
+  /* flag request */
   ngx_flag_t	weird_request:1;
   ngx_flag_t	big_request:1;
-  // matched rules
+  /* matched rules */
   ngx_array_t	*matched;
+  /* runtime flags (modifiers) */
+  ngx_flag_t	learning:1;
+  ngx_flag_t	enabled:1;
+  ngx_flag_t	post_action:1;
+  ngx_flag_t	extensive_log:1;
+  
 } ngx_http_request_ctx_t;
 
 #define TOP_DENIED_URL_T	"DeniedUrl"
@@ -366,17 +385,34 @@ typedef struct
 #define TOP_BASIC_RULE_T	"BasicRule"
 #define TOP_MAIN_BASIC_RULE_T	"MainRule"
 
+/* nginx-style names */
+#define TOP_DENIED_URL_N	"denied_url"
+#define TOP_LEARNING_FLAG_N	"learning_mode"
+#define TOP_ENABLED_FLAG_N	"rules_enabled"
+#define TOP_DISABLED_FLAG_N	"rules_disabled"
+#define TOP_CHECK_RULE_N	"check_rule"
+#define TOP_BASIC_RULE_N	"basic_rule"
+#define TOP_MAIN_BASIC_RULE_N	"main_rule"
+
 /*possible 'tokens' in rule */
 #define ID_T "id:"
 #define TRANSFORM_T "t:"
 #define SCORE_T "s:"
-#define PERSISTANT_SCORE_T "ps:"
+//#define PERSISTANT_SCORE_T "ps:"
 #define MSG_T "msg:"
 #define RX_T "rx:"
 #define STR_T "str:"
 #define MATCH_ZONE_T "mz:"
 #define WHITELIST_T "wl:"
 #define NEGATIVE_T  "negative"
+
+/* name of hardcoded variables to 
+   change behavior of naxsi at runtime */
+#define RT_EXTENSIVE_LOG "naxsi_extensive_log"
+#define RT_ENABLE "naxsi_flag_enable"
+#define RT_LEARNING "naxsi_flag_learning"
+#define RT_POST_ACTION "naxsi_flag_post_action"
+
 
 
 
@@ -402,6 +438,10 @@ ngx_int_t	ngx_http_output_forbidden_page(ngx_http_request_ctx_t *ctx,
 					       ngx_http_request_t *r);
 void
 naxsi_unescape_uri(u_char **dst, u_char **src, size_t size, ngx_uint_t type);
+
+
+int naxsi_unescape(ngx_str_t *str);
+
 
 /* static ngx_int_t ngx_http_dummy_subrequest(ngx_http_request_t *r,  */
 /* 					   ngx_chain_t *in); */
