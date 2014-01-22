@@ -14,7 +14,7 @@
 
 
 #ifndef NGX_CYCLE_POOL_SIZE
-#define NGX_CYCLE_POOL_SIZE     16384
+#define NGX_CYCLE_POOL_SIZE     NGX_DEFAULT_POOL_SIZE
 #endif
 
 
@@ -48,7 +48,7 @@ struct ngx_cycle_s {
     ngx_queue_t               reusable_connections_queue;
 
     ngx_array_t               listening;
-    ngx_array_t               pathes;
+    ngx_array_t               paths;
     ngx_list_t                open_files;
     ngx_list_t                shared_memory;
 

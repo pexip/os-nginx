@@ -361,6 +361,7 @@ ngx_http_ssi_header_filter(ngx_http_request_t *r)
         ngx_http_clear_content_length(r);
         ngx_http_clear_last_modified(r);
         ngx_http_clear_accept_ranges(r);
+        ngx_http_clear_etag(r);
     }
 
     return ngx_http_next_header_filter(r);
@@ -1024,6 +1025,7 @@ ngx_http_ssi_parse(ngx_http_request_t *r, ngx_http_ssi_ctx_t *ctx)
         switch (state) {
 
         case ssi_start_state:
+            /* not reached */
             break;
 
         case ssi_tag_state:
@@ -2003,7 +2005,7 @@ ngx_http_ssi_include(ngx_http_request_t *r, ngx_http_ssi_ctx_t *ctx,
 
     if (set && stub) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "\"set\" and \"stub\" may not be used together "
+                      "\"set\" and \"stub\" cannot be used together "
                       "in \"include\" SSI command");
         return NGX_HTTP_SSI_ERROR;
     }
@@ -2011,7 +2013,7 @@ ngx_http_ssi_include(ngx_http_request_t *r, ngx_http_ssi_ctx_t *ctx,
     if (wait) {
         if (uri == NULL) {
             ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                          "\"wait\" may not be used with file=\"%V\"", file);
+                          "\"wait\" cannot be used with file=\"%V\"", file);
             return NGX_HTTP_SSI_ERROR;
         }
 
@@ -2188,7 +2190,7 @@ ngx_http_ssi_include(ngx_http_request_t *r, ngx_http_ssi_ctx_t *ctx,
 
     } else {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "only one subrequest may be waited at the same time");
+                      "can only wait for one subrequest at a time");
     }
 
     return NGX_OK;

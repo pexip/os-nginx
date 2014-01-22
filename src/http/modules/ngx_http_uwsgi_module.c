@@ -467,6 +467,7 @@ ngx_http_uwsgi_handler(ngx_http_request_t *r)
     u->process_header = ngx_http_uwsgi_process_status_line;
     u->abort_request = ngx_http_uwsgi_abort_request;
     u->finalize_request = ngx_http_uwsgi_finalize_request;
+    r->state = 0;
 
     u->buffering = uwcf->upstream.buffering;
 
@@ -883,6 +884,7 @@ ngx_http_uwsgi_reinit_request(ngx_http_request_t *r)
     status->end = NULL;
 
     r->upstream->process_header = ngx_http_uwsgi_process_status_line;
+    r->state = 0;
 
     return NGX_OK;
 }
@@ -1016,7 +1018,7 @@ ngx_http_uwsgi_process_header(ngx_http_request_t *r)
             u = r->upstream;
 
             if (u->headers_in.status_n) {
-                return NGX_OK;
+                goto done;
             }
 
             if (u->headers_in.status) {
@@ -1045,6 +1047,14 @@ ngx_http_uwsgi_process_header(ngx_http_request_t *r)
 
             if (u->state) {
                 u->state->status = u->headers_in.status_n;
+            }
+
+        done:
+
+            if (u->headers_in.status_n == NGX_HTTP_SWITCHING_PROTOCOLS
+                && r->headers_in.upgrade)
+            {
+                u->upgrade = 1;
             }
 
             return NGX_OK;
@@ -1101,6 +1111,8 @@ ngx_http_uwsgi_create_loc_conf(ngx_conf_t *cf)
     conf->upstream.store_access = NGX_CONF_UNSET_UINT;
     conf->upstream.buffering = NGX_CONF_UNSET;
     conf->upstream.ignore_client_abort = NGX_CONF_UNSET;
+
+    conf->upstream.local = NGX_CONF_UNSET_PTR;
 
     conf->upstream.connect_timeout = NGX_CONF_UNSET_MSEC;
     conf->upstream.send_timeout = NGX_CONF_UNSET_MSEC;
@@ -1170,6 +1182,9 @@ ngx_http_uwsgi_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
     ngx_conf_merge_value(conf->upstream.ignore_client_abort,
                               prev->upstream.ignore_client_abort, 0);
 
+    ngx_conf_merge_ptr_value(conf->upstream.local,
+                              prev->upstream.local, NULL);
+
     ngx_conf_merge_msec_value(conf->upstream.connect_timeout,
                               prev->upstream.connect_timeout, 60000);
 
@@ -1216,8 +1231,8 @@ ngx_http_uwsgi_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     if (conf->upstream.busy_buffers_size < size) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-            "\"uwsgi_busy_buffers_size\" must be equal or bigger "
-            "than maximum of the value of \"uwsgi_buffer_size\" and "
+            "\"uwsgi_busy_buffers_size\" must be equal to or greater "
+            "than the maximum of the value of \"uwsgi_buffer_size\" and "
             "one of the \"uwsgi_buffers\"");
 
         return NGX_CONF_ERROR;
@@ -1247,8 +1262,8 @@ ngx_http_uwsgi_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 
     if (conf->upstream.temp_file_write_size < size) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-            "\"uwsgi_temp_file_write_size\" must be equal or bigger than "
-            "maximum of the value of \"uwsgi_buffer_size\" and "
+            "\"uwsgi_temp_file_write_size\" must be equal to or greater than "
+            "the maximum of the value of \"uwsgi_buffer_size\" and "
             "one of the \"uwsgi_buffers\"");
 
         return NGX_CONF_ERROR;
@@ -1270,8 +1285,8 @@ ngx_http_uwsgi_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
         && conf->upstream.max_temp_file_size < size) {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
             "\"uwsgi_max_temp_file_size\" must be equal to zero to disable "
-            "the temporary files usage or must be equal or bigger than "
-            "maximum of the value of \"uwsgi_buffer_size\" and "
+            "temporary files usage or must be equal to or greater than "
+            "the maximum of the value of \"uwsgi_buffer_size\" and "
             "one of the \"uwsgi_buffers\"");
 
         return NGX_CONF_ERROR;
@@ -1805,7 +1820,7 @@ ngx_http_uwsgi_cache_key(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     value = cf->args->elts;
 
-    if (uwcf->cache_key.value.len) {
+    if (uwcf->cache_key.value.data) {
         return "is duplicate";
     }
 
