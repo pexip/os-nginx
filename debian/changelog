@@ -1,3 +1,11 @@
+nginx (1.18.0-6.1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * Resolver: fixed off-by-one write in ngx_resolver_copy() (CVE-2021-23017)
+    (Closes: #989095)
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Sat, 29 May 2021 16:21:37 +0200
+
 nginx (1.18.0-6) unstable; urgency=medium
 
   * Fix GCC-10 compatibility (Closes: #957605).
