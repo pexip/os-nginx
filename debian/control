@@ -11,8 +11,6 @@ Build-Depends: debhelper-compat (= 12),
                libgd-dev,
                libgeoip-dev,
                libhiredis-dev,
-               liblua5.1-0-dev [!i386 !amd64 !kfreebsd-i386 !armel !armhf !powerpc !powerpcspe !mips !mipsel],
-               libluajit-5.1-dev [i386 amd64 kfreebsd-i386 armel armhf powerpc powerpcspe mips mipsel],
                libmaxminddb-dev,
                libmhash-dev,
                libpam0g-dev,
@@ -188,7 +186,6 @@ Depends: libnginx-mod-http-auth-pam (= ${binary:Version}),
          libnginx-mod-http-geoip2 (= ${binary:Version}),
          libnginx-mod-http-headers-more-filter (= ${binary:Version}),
          libnginx-mod-http-image-filter (= ${binary:Version}),
-         libnginx-mod-http-lua (= ${binary:Version}),
          libnginx-mod-http-perl (= ${binary:Version}),
          libnginx-mod-http-subs-filter (= ${binary:Version}),
          libnginx-mod-http-uploadprogress (= ${binary:Version}),
@@ -230,7 +227,7 @@ Description: nginx web/proxy server (extended version)
  OPTIONAL STREAM MODULES: Stream, GeoIP, GeoIP2
  .
  THIRD PARTY MODULES: Auth PAM, Cache Purge, DAV Ext, Echo, Fancy Index,
- GeoIP2, Headers More, Embedded Lua, HTTP Substitutions, Nchan, Upload Progress,
+ GeoIP2, Headers More, HTTP Substitutions, Nchan, Upload Progress,
  Upstream Fair Queue.
 
 Package: libnginx-mod-http-geoip
@@ -344,20 +341,6 @@ Description: PAM authentication module for Nginx
  .
  The module uses PAM as a backend for simple http authentication. It
  also allows setting the pam service name to allow more fine grained control.
-
-Package: libnginx-mod-http-lua
-Architecture: any
-Depends: libnginx-mod-http-ndk (= ${binary:Version}),
-         ${misc:Depends},
-         ${shlibs:Depends},
-Recommends: nginx,
-Description: Lua module for Nginx
- Embed Lua runtime into nginx.
- .
- This module embeds Lua, via the standard Lua 5.1 interpreter or LuaJIT
- 2.0/2.1, into Nginx and by leveraging Nginx's subrequests, allows the
- integration of the powerful Lua threads (Lua coroutines) into the Nginx event
- model.
 
 Package: libnginx-mod-http-ndk
 Architecture: any

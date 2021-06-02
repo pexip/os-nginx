@@ -16,7 +16,6 @@ DYN_MODS := \
 	http-geoip2 \
 	http-headers-more-filter \
 	http-image-filter \
-	http-lua \
 	http-ndk \
 	http-perl \
 	http-subs-filter \
@@ -123,7 +122,6 @@ extras_configure_flags := \
 			--add-dynamic-module=$(MODULESDIR)/http-fancyindex \
 			--add-dynamic-module=$(MODULESDIR)/http-geoip2 \
 			--add-dynamic-module=$(MODULESDIR)/nchan \
-			--add-dynamic-module=$(MODULESDIR)/http-lua \
 			--add-dynamic-module=$(MODULESDIR)/rtmp \
 			--add-dynamic-module=$(MODULESDIR)/http-uploadprogress \
 			--add-dynamic-module=$(MODULESDIR)/http-upstream-fair \
