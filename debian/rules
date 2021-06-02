@@ -15,7 +15,6 @@ DYN_MODS := \
 	http-geoip \
 	http-geoip2 \
 	http-headers-more-filter \
-	http-image-filter \
 	http-ndk \
 	http-perl \
 	http-subs-filter \
@@ -100,7 +99,6 @@ extras_configure_flags := \
 			--with-http_geoip_module=dynamic \
 			--with-http_gunzip_module \
 			--with-http_gzip_static_module \
-			--with-http_image_filter_module=dynamic \
 			--with-http_mp4_module \
 			--with-http_perl_module=dynamic \
 			--with-http_random_index_module \

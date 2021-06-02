@@ -8,7 +8,6 @@ XSBC-Pexip-Original-Uploaders: Christos Trochalakis <ctrochalakis@debian.org>,
 Build-Depends: debhelper-compat (= 12),
                dpkg-dev (>= 1.15.5),
                libexpat-dev,
-               libgd-dev,
                libgeoip-dev,
                libhiredis-dev,
                libmaxminddb-dev,
@@ -69,7 +68,6 @@ Description: small, powerful, scalable web/proxy server - common files
 Package: nginx-core
 Architecture: any
 Depends: libnginx-mod-http-geoip (= ${binary:Version}),
-         libnginx-mod-http-image-filter (= ${binary:Version}),
          libnginx-mod-http-xslt-filter (= ${binary:Version}),
          libnginx-mod-mail (= ${binary:Version}),
          libnginx-mod-stream (= ${binary:Version}),
@@ -185,7 +183,6 @@ Depends: libnginx-mod-http-auth-pam (= ${binary:Version}),
          libnginx-mod-http-geoip (= ${binary:Version}),
          libnginx-mod-http-geoip2 (= ${binary:Version}),
          libnginx-mod-http-headers-more-filter (= ${binary:Version}),
-         libnginx-mod-http-image-filter (= ${binary:Version}),
          libnginx-mod-http-perl (= ${binary:Version}),
          libnginx-mod-http-subs-filter (= ${binary:Version}),
          libnginx-mod-http-uploadprogress (= ${binary:Version}),
@@ -251,17 +248,6 @@ Description: GeoIP2 HTTP module for Nginx
  .
  Those variables include country, region, city, latitude, longitude, postal
  code, etc.
-
-Package: libnginx-mod-http-image-filter
-Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends},
-Recommends: nginx,
-Description: HTTP image filter module for Nginx
- The ngx_http_image_filter module is a filter that transforms images in JPEG,
- GIF, and PNG formats.
- .
- The module supports filters such as rotate, resize, crop, quality, sharpening,
- interlacing and more.
 
 Package: libnginx-mod-http-xslt-filter
 Architecture: any
