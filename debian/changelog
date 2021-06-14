@@ -1,3 +1,9 @@
+nginx (1.18.0-6.1pexip1) pexip; urgency=medium
+
+  * Bump version to 1.18.0-6.1pexip1
+
+ -- Huw Jones <huw@pexip.com>  Mon, 14 Jun 2021 10:44:56 +0100
+
 nginx (1.18.0-6.1) unstable; urgency=high
 
   * Non-maintainer upload.
