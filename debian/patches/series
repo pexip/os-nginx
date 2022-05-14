@@ -2,3 +2,4 @@
 0003-define_gnu_source-on-other-glibc-based-platforms.patch
 CVE-2019-20372.patch
 Resolver-fixed-off-by-one-write-in-ngx_resolver_copy.patch
+CVE-2021-3618.patch

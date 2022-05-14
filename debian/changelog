@@ -1,3 +1,19 @@
+nginx (1.18.0-6.1+deb11u2) bullseye; urgency=medium
+
+  * d/patches/CVE-2021-3618.patch: Include upstream changeset from NGINX
+    that adds mitigations into the Mail module for CVE-2021-3618.patch.
+    (Closes: #991328)
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Sat, 14 May 2022 08:27:08 +0200
+
+nginx (1.18.0-6.1+deb11u1) bullseye; urgency=medium
+
+  * Backport upstream bugfix for segfault in nginx core >= 1.15.0 when
+    libnginx-mod-http-lua is loaded and init_worker_by_lua* is used.
+    (Closes: #994178)
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Tue, 15 Mar 2022 21:36:18 +0100
+
 nginx (1.18.0-6.1) unstable; urgency=high
 
   * Non-maintainer upload.
