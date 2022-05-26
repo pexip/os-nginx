@@ -518,6 +518,7 @@ typedef struct {
 #    if (nginx_version >= 1007000)
     ngx_uint_t                     ssl_verify_depth;
     ngx_str_t                      ssl_trusted_certificate;
+    ngx_str_t                      ssl_trusted_ca_path;
     ngx_str_t                      ssl_crl;
 #    endif /* nginx_version >= 1007000 */
 #    if (nginx_version >= 1007008)
@@ -967,6 +968,7 @@ typedef struct {
 #    if (nginx_version >= 1007000)
     ngx_uint_t                 ssl_verify_depth;
     ngx_str_t                  ssl_trusted_certificate;
+    ngx_str_t                  ssl_trusted_ca_path;
     ngx_str_t                  ssl_crl;
 #    endif /* nginx_version >= 1007000 */
 #    if (nginx_version >= 1007008)

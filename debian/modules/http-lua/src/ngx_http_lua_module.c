@@ -574,6 +574,13 @@ static ngx_command_t ngx_http_lua_cmds[] = {
       offsetof(ngx_http_lua_loc_conf_t, ssl_trusted_certificate),
       NULL },
 
+    { ngx_string("lua_ssl_trusted_ca_path"),
+      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
+      ngx_conf_set_str_slot,
+      NGX_HTTP_LOC_CONF_OFFSET,
+      offsetof(ngx_http_lua_loc_conf_t, ssl_trusted_ca_path),
+      NULL },
+
     { ngx_string("lua_ssl_crl"),
       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_str_slot,
@@ -1069,6 +1076,7 @@ ngx_http_lua_create_loc_conf(ngx_conf_t *cf)
      *      conf->ssl_protocols = 0;
      *      conf->ssl_ciphers = { 0, NULL };
      *      conf->ssl_trusted_certificate = { 0, NULL };
+     *      conf->ssl_trusted_ca_path = { 0, NULL };
      *      conf->ssl_crl = { 0, NULL };
      */
 
@@ -1161,6 +1169,8 @@ ngx_http_lua_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
                               prev->ssl_verify_depth, 1);
     ngx_conf_merge_str_value(conf->ssl_trusted_certificate,
                              prev->ssl_trusted_certificate, "");
+    ngx_conf_merge_str_value(conf->ssl_trusted_ca_path,
+                             prev->ssl_trusted_ca_path, "");
     ngx_conf_merge_str_value(conf->ssl_crl, prev->ssl_crl, "");
 
     if (ngx_http_lua_set_ssl(cf, conf) != NGX_OK) {
@@ -1241,12 +1251,13 @@ ngx_http_lua_set_ssl(ngx_conf_t *cf, ngx_http_lua_loc_conf_t *llcf)
         return NGX_ERROR;
     }
 
-    if (llcf->ssl_trusted_certificate.len) {
+    if (llcf->ssl_trusted_certificate.len || llcf->ssl_trusted_ca_path.len) {
 
 #if defined(nginx_version) && nginx_version >= 1003007
 
         if (ngx_ssl_trusted_certificate(cf, llcf->ssl,
                                         &llcf->ssl_trusted_certificate,
+                                        &llcf->ssl_trusted_ca_path,
                                         llcf->ssl_verify_depth)
             != NGX_OK)
         {

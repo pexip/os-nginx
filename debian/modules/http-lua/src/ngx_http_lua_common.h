@@ -271,6 +271,7 @@ typedef struct {
     ngx_str_t               ssl_ciphers;
     ngx_uint_t              ssl_verify_depth;
     ngx_str_t               ssl_trusted_certificate;
+    ngx_str_t               ssl_trusted_ca_path;
     ngx_str_t               ssl_crl;
 #endif
 

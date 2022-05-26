@@ -1,3 +1,9 @@
+nginx (1.18.0-6.1pexip2) pexip; urgency=medium
+
+  * Add ssl_trusted_ca_path config option
+
+ -- Huw Jones <huw@pexip.com>  Thu, 26 May 2022 11:00:06 +0100
+
 nginx (1.18.0-6.1pexip1) pexip; urgency=medium
 
   * Bump version to 1.18.0-6.1pexip1
