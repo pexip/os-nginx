@@ -2,4 +2,4 @@
 0003-define_gnu_source-on-other-glibc-based-platforms.patch
 CVE-2019-20372.patch
 Resolver-fixed-off-by-one-write-in-ngx_resolver_copy.patch
-0004-add-ssl_trusted_ca_path.patch
+pexip-add-ssl_trusted_ca_path.patch
