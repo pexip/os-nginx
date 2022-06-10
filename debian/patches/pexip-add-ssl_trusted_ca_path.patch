@@ -190,7 +190,23 @@ Subject: [PATCH] add ssl_trusted_ca_path
      { ngx_string("ssl_prefer_server_ciphers"),
        NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_FLAG,
        ngx_conf_set_flag_slot,
-@@ -792,6 +799,7 @@
+@@ -558,6 +565,7 @@
+      *     sscf->ecdh_curve = { 0, NULL };
+      *     sscf->client_certificate = { 0, NULL };
+      *     sscf->trusted_certificate = { 0, NULL };
++     *     sscf->trusted_ca_path = { 0, NULL };
+      *     sscf->crl = { 0, NULL };
+      *     sscf->ciphers = { 0, NULL };
+      *     sscf->shm_zone = NULL;
+@@ -634,6 +642,7 @@
+                          "");
+     ngx_conf_merge_str_value(conf->trusted_certificate,
+                          prev->trusted_certificate, "");
++    ngx_conf_merge_str_value(conf->trusted_ca_path, prev->trusted_ca_path, "");
+     ngx_conf_merge_str_value(conf->crl, prev->crl, "");
+ 
+     ngx_conf_merge_str_value(conf->ecdh_curve, prev->ecdh_curve,
+@@ -792,6 +801,7 @@
  
      if (ngx_ssl_trusted_certificate(cf, &conf->ssl,
                                      &conf->trusted_certificate,
@@ -284,16 +300,15 @@ Subject: [PATCH] add ssl_trusted_ca_path
       *     scf->crl = { 0, NULL };
       *     scf->ciphers = { 0, NULL };
       *     scf->shm_zone = NULL;
-@@ -312,6 +321,8 @@
+@@ -312,6 +321,7 @@
                           prev->client_certificate, "");
      ngx_conf_merge_str_value(conf->trusted_certificate,
                           prev->trusted_certificate, "");
-+    ngx_conf_merge_str_value(conf->trusted_ca_path,
-+                         prev->trusted_ca_path, "");
++    ngx_conf_merge_str_value(conf->trusted_ca_path, prev->trusted_ca_path, "");
      ngx_conf_merge_str_value(conf->crl, prev->crl, "");
  
      ngx_conf_merge_str_value(conf->ciphers, prev->ciphers, NGX_DEFAULT_CIPHERS);
-@@ -402,6 +413,7 @@
+@@ -402,6 +412,7 @@
  
          if (ngx_ssl_trusted_certificate(cf, &conf->ssl,
                                          &conf->trusted_certificate,
@@ -387,7 +402,23 @@ Subject: [PATCH] add ssl_trusted_ca_path
      { ngx_string("ssl_prefer_server_ciphers"),
        NGX_STREAM_MAIN_CONF|NGX_STREAM_SRV_CONF|NGX_CONF_FLAG,
        ngx_conf_set_flag_slot,
-@@ -759,6 +766,7 @@
+@@ -586,6 +593,7 @@
+      *     scf->ecdh_curve = { 0, NULL };
+      *     scf->client_certificate = { 0, NULL };
+      *     scf->trusted_certificate = { 0, NULL };
++     *     scf->trusted_ca_path = { 0, NULL };
+      *     scf->crl = { 0, NULL };
+      *     scf->ciphers = { 0, NULL };
+      *     scf->shm_zone = NULL;
+@@ -643,6 +651,7 @@
+                          "");
+     ngx_conf_merge_str_value(conf->trusted_certificate,
+                          prev->trusted_certificate, "");
++    ngx_conf_merge_str_value(conf->trusted_ca_path, prev->trusted_ca_path, "");
+     ngx_conf_merge_str_value(conf->crl, prev->crl, "");
+ 
+     ngx_conf_merge_str_value(conf->ecdh_curve, prev->ecdh_curve,
+@@ -759,6 +768,7 @@
  
          if (ngx_ssl_trusted_certificate(cf, &conf->ssl,
                                          &conf->trusted_certificate,
