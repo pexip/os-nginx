@@ -1,6 +1,7 @@
 nginx (1.18.0-6.1pexip3) pexip; urgency=medium
 
   * Add ssl_client_ca_path config option
+  * Add pexip flavour
 
  -- Huw Jones <huw@pexip.com>  Fri, 10 Jun 2022 11:35:56 +0100
 
