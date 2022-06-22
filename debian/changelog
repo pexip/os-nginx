@@ -1,3 +1,9 @@
+nginx (1.18.0-6.1pexip4) pexip; urgency=medium
+
+  * Initial bullseye build.
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Wed, 22 Jun 2022 14:04:20 +0100
+
 nginx (1.18.0-6.1pexip3) pexip; urgency=medium
 
   * Add ssl_client_ca_path config option
