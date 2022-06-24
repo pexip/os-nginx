@@ -1,8 +1,15 @@
-nginx (1.18.0-6.1pexip4) pexip; urgency=medium
+nginx (1.18.0-6.1pexip5) pexip; urgency=medium
 
   * Initial bullseye build.
 
- -- Mark Hymers <mark.hymers@pexip.com>  Wed, 22 Jun 2022 14:04:20 +0100
+ -- Mark Hymers <mark.hymers@pexip.com>  Fri, 24 Jun 2022 13:00:08 +0100
+
+nginx (1.18.0-6.1pexip4) pexip; urgency=medium
+
+  * ssl_client_ca_path/ssl_trusted_ca_path: don't send empty str to OpenSSL
+  * ssl_client_ca_path: fix logic error when ca_path not specified
+
+ -- Huw Jones <huw@pexip.com>  Thu, 23 Jun 2022 08:52:16 +0100
 
 nginx (1.18.0-6.1pexip3) pexip; urgency=medium
 

@@ -36,7 +36,7 @@
      if (conf->verify) {
  
 -        if (conf->client_certificate.len == 0 && conf->verify != 3) {
-+        if ((conf->client_certificate.len == 0 || conf->client_ca_path.len == 0) && conf->verify != 3) {
++        if (conf->client_certificate.len == 0 && conf->client_ca_path.len == 0 && conf->verify != 3) {
              ngx_log_error(NGX_LOG_EMERG, cf->log, 0,
 -                          "no ssl_client_certificate for ssl_verify_client");
 +                          "no ssl_client_certificate or ssl_client_ca_path for ssl_verify_client");
@@ -96,7 +96,7 @@
      if (conf->verify) {
  
 -        if (conf->client_certificate.len == 0 && conf->verify != 3) {
-+        if ((conf->client_certificate.len == 0 || conf->client_ca_path.len == 0) && conf->verify != 3) {
++        if (conf->client_certificate.len == 0 && conf->client_ca_path.len == 0 && conf->verify != 3) {
              ngx_log_error(NGX_LOG_EMERG, cf->log, 0,
 -                          "no ssl_client_certificate for ssl_verify_client");
 +                          "no ssl_client_certificate or ssl_client_ca_path for ssl_verify_client");
@@ -156,7 +156,7 @@
      if (conf->verify) {
  
 -        if (conf->client_certificate.len == 0 && conf->verify != 3) {
-+        if ((conf->client_certificate.len == 0 || conf->client_ca_path.len == 0) && conf->verify != 3) {
++        if (conf->client_certificate.len == 0 && conf->client_ca_path.len == 0 && conf->verify != 3) {
              ngx_log_error(NGX_LOG_EMERG, cf->log, 0,
 -                          "no ssl_client_certificate for ssl_verify_client");
 +                          "no ssl_client_certificate or ssl_client_ca_path for ssl_verify_client");
@@ -195,7 +195,7 @@
      }
  
 -    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, NULL)
-+    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, (char *) ca_path->data)
++    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, ca_path->len ? (char *) ca_path->data : NULL)
          == 0)
      {
          ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0,

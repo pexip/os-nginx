@@ -33,7 +33,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      }
  
 -    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, NULL)
-+    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, (char *) ca_path->data)
++    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, ca_path->len ? (char *) ca_path->data : NULL)
          == 0)
      {
          ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0,
