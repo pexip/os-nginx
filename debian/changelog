@@ -1,3 +1,10 @@
+nginx (1.18.0-6.1pexip5) pexip; urgency=medium
+
+  * tune worker_connections
+  * add streams config loading
+
+ -- Huw Jones <huw@pexip.com>  Mon, 27 Jun 2022 13:06:23 +0100
+
 nginx (1.18.0-6.1pexip4) pexip; urgency=medium
 
   * ssl_client_ca_path/ssl_trusted_ca_path: don't send empty str to OpenSSL
