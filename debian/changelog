@@ -6,9 +6,10 @@ nginx (1.18.0-6.1pexip6) pexip-bullseye; urgency=medium
 
 nginx (1.18.0-6.1pexip5) pexip; urgency=medium
 
-  * Initial bullseye build.
+  * tune worker_connections
+  * add streams config loading
 
- -- Mark Hymers <mark.hymers@pexip.com>  Fri, 24 Jun 2022 13:00:08 +0100
+ -- Huw Jones <huw@pexip.com>  Mon, 27 Jun 2022 13:06:23 +0100
 
 nginx (1.18.0-6.1pexip4) pexip; urgency=medium
 
