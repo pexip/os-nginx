@@ -1,4 +1,11 @@
+nginx (1.18.0-6.1pexip5+deb10u2) pexip; urgency=medium
+
+  * Fix changelog entry
+
+ -- Huw Jones <huw@pexip.com>  Tue, 06 Sep 2022 14:02:22 +0100
+
 nginx (1.18.0-6.1pexip5+deb10u1) pexip; urgency=medium
+
   * Ensure certificates specified by ssl_client_ca_path are sent in client
     certificate request
   * ssl_client_ca_path/ssl_trusted_ca_path ensure ca_path is set event if
