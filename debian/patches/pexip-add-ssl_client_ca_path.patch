@@ -190,19 +190,56 @@
  {
      STACK_OF(X509_NAME)  *list;
  
-@@ -878,12 +878,12 @@
+@@ -870,20 +870,21 @@
+ 
+     SSL_CTX_set_verify_depth(ssl->ctx, depth);
+ 
+-    if (cert->len == 0) {
++    if (cert->len == 0 && ca_path->len == 0) {
+         return NGX_OK;
+     }
+ 
+-    if (ngx_conf_full_name(cf->cycle, cert, 1) != NGX_OK) {
++    if (cert->len && ngx_conf_full_name(cf->cycle, cert, 1) != NGX_OK) {
          return NGX_ERROR;
      }
  
 -    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, NULL)
-+    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, ca_path->len ? (char *) ca_path->data : NULL)
++    if (SSL_CTX_load_verify_locations(ssl->ctx, cert->len ? (char *) cert->data: NULL, ca_path->len ? (char *) ca_path->data : NULL)
          == 0)
      {
          ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0,
 -                      "SSL_CTX_load_verify_locations(\"%s\") failed",
 -                      cert->data);
-+                      "SSL_CTX_load_verify_locations(\"%s\", \"%s\") failed",
-+                      cert->data, ca_path->data);
++                      "client_certificate SSL_CTX_load_verify_locations(\"%s\", \"%s\") failed",
++                      cert->data,
++                      ca_path->data);
+         return NGX_ERROR;
+     }
+ 
+@@ -894,11 +895,22 @@
+ 
+     ERR_clear_error();
+ 
+-    list = SSL_load_client_CA_file((char *) cert->data);
+-
++    list = sk_X509_NAME_new_null();
+     if (list == NULL) {
++        ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0, "sk_X509_NAME_new_null");
++        return NGX_ERROR;
++    }
++
++    if (cert->len && SSL_add_file_cert_subjects_to_stack(list, (char *) cert->data) == 0) {
++        ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0,
++                      "SSL_add_file_cert_subjects_to_stack(\"%s\") failed", cert->data);
++        sk_X509_NAME_free(list);
++        return NGX_ERROR;
++    }
++    if (ca_path->len && SSL_add_dir_cert_subjects_to_stack(list, (char *) ca_path->data) == 0) {
+         ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0,
+-                      "SSL_load_client_CA_file(\"%s\") failed", cert->data);
++                      "SSL_add_dir_cert_subjects_to_stack(\"%s\") failed", ca_path->data);
++        sk_X509_NAME_free(list);
          return NGX_ERROR;
      }
  
