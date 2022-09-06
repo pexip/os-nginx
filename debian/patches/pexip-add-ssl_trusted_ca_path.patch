@@ -19,7 +19,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
 
 --- a/src/event/ngx_event_openssl.c
 +++ b/src/event/ngx_event_openssl.c
-@@ -910,7 +910,7 @@
+@@ -910,24 +910,25 @@
  
  ngx_int_t
  ngx_ssl_trusted_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
@@ -28,18 +28,24 @@ Subject: [PATCH] add ssl_trusted_ca_path
  {
      SSL_CTX_set_verify_depth(ssl->ctx, depth);
  
-@@ -922,12 +922,13 @@
+-    if (cert->len == 0) {
++    if (cert->len == 0 && ca_path->len == 0) {
+         return NGX_OK;
+     }
+ 
+-    if (ngx_conf_full_name(cf->cycle, cert, 1) != NGX_OK) {
++    if (cert->len && ngx_conf_full_name(cf->cycle, cert, 1) != NGX_OK) {
          return NGX_ERROR;
      }
  
 -    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, NULL)
-+    if (SSL_CTX_load_verify_locations(ssl->ctx, (char *) cert->data, ca_path->len ? (char *) ca_path->data : NULL)
++    if (SSL_CTX_load_verify_locations(ssl->ctx, cert->len ? (char *) cert->data: NULL, ca_path->len ? (char *) ca_path->data : NULL)
          == 0)
      {
          ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0,
 -                      "SSL_CTX_load_verify_locations(\"%s\") failed",
 -                      cert->data);
-+                      "SSL_CTX_load_verify_locations(\"%s\", \"%s\") failed",
++                      "trusted_certificate SSL_CTX_load_verify_locations(\"%s\", \"%s\") failed",
 +                      cert->data,
 +                      ca_path->data);
          return NGX_ERROR;
