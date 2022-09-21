@@ -1,3 +1,9 @@
+nginx (1.18.0-6.1pexip5+deb11u2) pexip; urgency=medium
+
+  * New upstream release with security fixes
+
+ -- Huw Jones <huw@pexip.com>  Wed, 21 Sep 2022 16:20:52 +0100
+
 nginx (1.18.0-6.1+deb11u2) bullseye; urgency=medium
 
   * d/patches/CVE-2021-3618.patch: Include upstream changeset from NGINX
