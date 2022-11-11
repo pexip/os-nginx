@@ -119,9 +119,8 @@ static ngx_int_t sub_respond_status(ngx_int_t status, void *ptr, sub_data_t *d) 
 }
 
 static ngx_int_t sub_respond_notice(ngx_int_t notice, void *ptr, sub_data_t *d) {
-  
   if(!d->unhooked) {
-    return memstore_ipc_send_publish_notice(d->originator, d->chid, notice, ptr);
+    return memstore_ipc_send_publish_notice(d->originator, d->chid, notice, NULL);
   }
   else {
     return NGX_OK;

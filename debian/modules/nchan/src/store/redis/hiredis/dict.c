@@ -34,14 +34,10 @@
  */
 
 #include "fmacros.h"
-#include "alloc.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <limits.h>
 #include "dict.h"
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
 
 /* -------------------------- private prototypes ---------------------------- */
 
@@ -75,10 +71,7 @@ static void _dictReset(dict *ht) {
 
 /* Create a new hash table */
 static dict *dictCreate(dictType *type, void *privDataPtr) {
-    dict *ht = hi_malloc(sizeof(*ht));
-    if (ht == NULL)
-        return NULL;
-
+    dict *ht = malloc(sizeof(*ht));
     _dictInit(ht,type,privDataPtr);
     return ht;
 }
@@ -104,9 +97,7 @@ static int dictExpand(dict *ht, unsigned long size) {
     _dictInit(&n, ht->type, ht->privdata);
     n.size = realsize;
     n.sizemask = realsize-1;
-    n.table = hi_calloc(realsize,sizeof(dictEntry*));
-    if (n.table == NULL)
-        return DICT_ERR;
+    n.table = calloc(realsize,sizeof(dictEntry*));
 
     /* Copy all the elements from the old to the new table:
      * note that if the old hash table is empty ht->size is zero,
@@ -133,7 +124,7 @@ static int dictExpand(dict *ht, unsigned long size) {
         }
     }
     assert(ht->used == 0);
-    hi_free(ht->table);
+    free(ht->table);
 
     /* Remap the new hashtable in the old */
     *ht = n;
@@ -151,10 +142,7 @@ static int dictAdd(dict *ht, void *key, void *val) {
         return DICT_ERR;
 
     /* Allocates the memory and stores key */
-    entry = hi_malloc(sizeof(*entry));
-    if (entry == NULL)
-        return DICT_ERR;
-
+    entry = malloc(sizeof(*entry));
     entry->next = ht->table[index];
     ht->table[index] = entry;
 
@@ -178,9 +166,6 @@ static int dictReplace(dict *ht, void *key, void *val) {
         return 1;
     /* It already exists, get the entry */
     entry = dictFind(ht, key);
-    if (entry == NULL)
-        return 0;
-
     /* Free the old value and set the new one */
     /* Set the new value and free the old one. Note that it is important
      * to do that in this order, as the value may just be exactly the same
@@ -214,7 +199,7 @@ static int dictDelete(dict *ht, const void *key) {
 
             dictFreeEntryKey(ht,de);
             dictFreeEntryVal(ht,de);
-            hi_free(de);
+            free(de);
             ht->used--;
             return DICT_OK;
         }
@@ -237,13 +222,13 @@ static int _dictClear(dict *ht) {
             nextHe = he->next;
             dictFreeEntryKey(ht, he);
             dictFreeEntryVal(ht, he);
-            hi_free(he);
+            free(he);
             ht->used--;
             he = nextHe;
         }
     }
     /* Free the table and the allocated cache structure */
-    hi_free(ht->table);
+    free(ht->table);
     /* Re-initialize the table */
     _dictReset(ht);
     return DICT_OK; /* never fails */
@@ -252,7 +237,7 @@ static int _dictClear(dict *ht) {
 /* Clear & Release the hash table */
 static void dictRelease(dict *ht) {
     _dictClear(ht);
-    hi_free(ht);
+    free(ht);
 }
 
 static dictEntry *dictFind(dict *ht, const void *key) {
@@ -271,9 +256,7 @@ static dictEntry *dictFind(dict *ht, const void *key) {
 }
 
 static dictIterator *dictGetIterator(dict *ht) {
-    dictIterator *iter = hi_malloc(sizeof(*iter));
-    if (iter == NULL)
-        return NULL;
+    dictIterator *iter = malloc(sizeof(*iter));
 
     iter->ht = ht;
     iter->index = -1;
@@ -303,7 +286,7 @@ static dictEntry *dictNext(dictIterator *iter) {
 }
 
 static void dictReleaseIterator(dictIterator *iter) {
-    hi_free(iter);
+    free(iter);
 }
 
 /* ------------------------- private functions ------------------------------ */
@@ -311,7 +294,7 @@ static void dictReleaseIterator(dictIterator *iter) {
 /* Expand the hash table if needed */
 static int _dictExpandIfNeeded(dict *ht) {
     /* If the hash table is empty expand it to the initial size,
-     * if the table is "full" double its size. */
+     * if the table is "full" dobule its size. */
     if (ht->size == 0)
         return dictExpand(ht, DICT_HT_INITIAL_SIZE);
     if (ht->used == ht->size)
@@ -353,5 +336,3 @@ static int _dictKeyIndex(dict *ht, const void *key) {
     return h;
 }
 
-
-#pragma GCC diagnostic pop

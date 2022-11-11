@@ -45,7 +45,6 @@
 #define REDIS_ERR_EOF 3 /* End of file */
 #define REDIS_ERR_PROTOCOL 4 /* Protocol error */
 #define REDIS_ERR_OOM 5 /* Out of memory */
-#define REDIS_ERR_TIMEOUT 6 /* Timed out */
 #define REDIS_ERR_OTHER 2 /* Everything else... */
 
 #define REDIS_REPLY_STRING 1
@@ -54,20 +53,8 @@
 #define REDIS_REPLY_NIL 4
 #define REDIS_REPLY_STATUS 5
 #define REDIS_REPLY_ERROR 6
-#define REDIS_REPLY_DOUBLE 7
-#define REDIS_REPLY_BOOL 8
-#define REDIS_REPLY_MAP 9
-#define REDIS_REPLY_SET 10
-#define REDIS_REPLY_ATTR 11
-#define REDIS_REPLY_PUSH 12
-#define REDIS_REPLY_BIGNUM 13
-#define REDIS_REPLY_VERB 14
 
-/* Default max unused reader buffer. */
-#define REDIS_READER_MAX_BUF (1024*16)
-
-/* Default multi-bulk element limit */
-#define REDIS_READER_MAX_ARRAY_ELEMENTS ((1LL<<32) - 1)
+#define REDIS_READER_MAX_BUF (1024*16)  /* Default max unused reader buffer. */
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,7 +62,7 @@ extern "C" {
 
 typedef struct redisReadTask {
     int type;
-    long long elements; /* number of elements in multibulk container */
+    int elements; /* number of elements in multibulk container */
     int idx; /* index in parent (array) object */
     void *obj; /* holds user-generated value for a read task */
     struct redisReadTask *parent; /* parent task */
@@ -84,11 +71,9 @@ typedef struct redisReadTask {
 
 typedef struct redisReplyObjectFunctions {
     void *(*createString)(const redisReadTask*, char*, size_t);
-    void *(*createArray)(const redisReadTask*, size_t);
+    void *(*createArray)(const redisReadTask*, int);
     void *(*createInteger)(const redisReadTask*, long long);
-    void *(*createDouble)(const redisReadTask*, double, char*, size_t);
     void *(*createNil)(const redisReadTask*);
-    void *(*createBool)(const redisReadTask*, int);
     void (*freeObject)(void*);
 } redisReplyObjectFunctions;
 
@@ -100,11 +85,8 @@ typedef struct redisReader {
     size_t pos; /* Buffer cursor */
     size_t len; /* Buffer length */
     size_t maxbuf; /* Max length of unused buffer */
-    long long maxelements; /* Max multi-bulk elements */
 
-    redisReadTask **task;
-    int tasks;
-
+    redisReadTask rstack[9];
     int ridx; /* Index of current read task */
     void *reply; /* Temporary reply pointer */
 
@@ -118,9 +100,14 @@ void redisReaderFree(redisReader *r);
 int redisReaderFeed(redisReader *r, const char *buf, size_t len);
 int redisReaderGetReply(redisReader *r, void **reply);
 
-#define redisReaderSetPrivdata(_r, _p) (int)(((redisReader*)(_r))->privdata = (_p))
-#define redisReaderGetObject(_r) (((redisReader*)(_r))->reply)
-#define redisReaderGetError(_r) (((redisReader*)(_r))->errstr)
+/* Backwards compatibility, can be removed on big version bump. */
+#define redisReplyReaderCreate redisReaderCreate
+#define redisReplyReaderFree redisReaderFree
+#define redisReplyReaderFeed redisReaderFeed
+#define redisReplyReaderGetReply redisReaderGetReply
+#define redisReplyReaderSetPrivdata(_r, _p) (int)(((redisReader*)(_r))->privdata = (_p))
+#define redisReplyReaderGetObject(_r) (((redisReader*)(_r))->reply)
+#define redisReplyReaderGetError(_r) (((redisReader*)(_r))->errstr)
 
 #ifdef __cplusplus
 }

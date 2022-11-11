@@ -65,9 +65,6 @@ typedef struct {
     int                            backlog;
     int                            rcvbuf;
     int                            sndbuf;
-#if (NGX_HAVE_TCP_FASTOPEN)
-    int                            fastopen;
-#endif
     int                            type;
 } ngx_stream_listen_t;
 
