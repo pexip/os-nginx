@@ -10,7 +10,6 @@
 
 #include <ngx_config.h>
 #include <ngx_core.h>
-#include <openssl/aes.h>
 
 
 typedef struct {
@@ -20,7 +19,8 @@ typedef struct {
     unsigned    size:4;
     u_char      buf[16];
     u_char      iv[16];
-    AES_KEY     key;
+    u_char      key[32];
+    size_t      keylen;
 } ngx_rtmp_mpegts_file_t;
 
 

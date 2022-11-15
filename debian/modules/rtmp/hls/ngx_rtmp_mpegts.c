@@ -8,6 +8,7 @@
 #include <ngx_core.h>
 #include "ngx_rtmp_mpegts.h"
 
+#include <openssl/evp.h>
 
 static u_char ngx_rtmp_mpegts_header[] = {
 
@@ -85,6 +86,9 @@ ngx_rtmp_mpegts_write_file(ngx_rtmp_mpegts_file_t *file, u_char *in,
 
     static u_char  buf[1024];
 
+    EVP_CIPHER_CTX *ctx;
+    int enclen;
+
     if (!file->encrypt) {
         ngx_log_debug1(NGX_LOG_DEBUG_CORE, file->log, 0,
                        "mpegts: write %uz bytes", in_size);
@@ -102,6 +106,10 @@ ngx_rtmp_mpegts_write_file(ngx_rtmp_mpegts_file_t *file, u_char *in,
     ngx_log_debug1(NGX_LOG_DEBUG_CORE, file->log, 0,
                    "mpegts: write %uz encrypted bytes", in_size);
 
+    ctx = EVP_CIPHER_CTX_new();
+    if (!ctx)
+        return NGX_ERROR;
+
     out = buf;
     out_size = sizeof(buf);
 
@@ -111,7 +119,11 @@ ngx_rtmp_mpegts_write_file(ngx_rtmp_mpegts_file_t *file, u_char *in,
         in += 16 - file->size;
         in_size -= 16 - file->size;
 
-        AES_cbc_encrypt(file->buf, out, 16, &file->key, file->iv, AES_ENCRYPT);
+        EVP_CIPHER_CTX_reset(ctx);
+        EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, file->key, file->iv);
+        EVP_CIPHER_CTX_set_padding(ctx, 0);
+        EVP_EncryptUpdate(ctx, out, &enclen, file->buf, 16);
+        EVP_EncryptFinal_ex(ctx, out, &enclen);
 
         out += 16;
         out_size -= 16;
@@ -127,7 +139,11 @@ ngx_rtmp_mpegts_write_file(ngx_rtmp_mpegts_file_t *file, u_char *in,
                 n = out_size;
             }
 
-            AES_cbc_encrypt(in, out, n, &file->key, file->iv, AES_ENCRYPT);
+            EVP_CIPHER_CTX_reset(ctx);
+            EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, file->key, file->iv);
+            EVP_CIPHER_CTX_set_padding(ctx, 0);
+            EVP_EncryptUpdate(ctx, out, &enclen, file->buf, 16);
+            EVP_EncryptFinal_ex(ctx, out, &enclen);
 
             in += n;
             in_size -= n;
@@ -138,6 +154,7 @@ ngx_rtmp_mpegts_write_file(ngx_rtmp_mpegts_file_t *file, u_char *in,
 
         rc = ngx_write_fd(file->fd, buf, out - buf + n);
         if (rc < 0) {
+            EVP_CIPHER_CTX_free(ctx);
             return NGX_ERROR;
         }
 
@@ -150,6 +167,7 @@ ngx_rtmp_mpegts_write_file(ngx_rtmp_mpegts_file_t *file, u_char *in,
         file->size += in_size;
     }
 
+    EVP_CIPHER_CTX_free(ctx);
     return NGX_OK;
 }
 
@@ -327,9 +345,11 @@ ngx_int_t
 ngx_rtmp_mpegts_init_encryption(ngx_rtmp_mpegts_file_t *file,
     u_char *key, size_t key_len, uint64_t iv)
 {
-    if (AES_set_encrypt_key(key, key_len * 8, &file->key)) {
+    if (key_len > sizeof(file->key)) {
         return NGX_ERROR;
     }
+    ngx_memcpy(file->key, key, key_len);
+    file->keylen = key_len;
 
     ngx_memzero(file->iv, 8);
 
@@ -381,11 +401,20 @@ ngx_rtmp_mpegts_close_file(ngx_rtmp_mpegts_file_t *file)
 {
     u_char   buf[16];
     ssize_t  rc;
+    EVP_CIPHER_CTX *ctx;
+    int enclen;
 
     if (file->encrypt) {
         ngx_memset(file->buf + file->size, 16 - file->size, 16 - file->size);
 
-        AES_cbc_encrypt(file->buf, buf, 16, &file->key, file->iv, AES_ENCRYPT);
+	ctx = EVP_CIPHER_CTX_new();
+	if (!ctx)
+		return NGX_ERROR;
+        EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, file->key, file->iv);
+        EVP_CIPHER_CTX_set_padding(ctx, 0);
+        EVP_EncryptUpdate(ctx, buf, &enclen, file->buf, 16);
+        EVP_EncryptFinal_ex(ctx, buf, &enclen);
+	EVP_CIPHER_CTX_free(ctx);
 
         rc = ngx_write_fd(file->fd, buf, 16);
         if (rc < 0) {

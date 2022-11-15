@@ -1,0 +1,103 @@
+diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
+index 9699871..d9a3def 100644
+--- a/src/event/ngx_event_openssl.c
++++ b/src/event/ngx_event_openssl.c
+@@ -73,7 +73,12 @@ static void ngx_ssl_session_rbtree_insert_value(ngx_rbtree_node_t *temp,
+ #ifdef SSL_CTRL_SET_TLSEXT_TICKET_KEY_CB
+ static int ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
+     unsigned char *name, unsigned char *iv, EVP_CIPHER_CTX *ectx,
+-    HMAC_CTX *hctx, int enc);
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++    HMAC_CTX *hctx,
++#else
++    EVP_MAC_CTX *hctx,
++#endif
++    int enc);
+ static void ngx_ssl_session_ticket_keys_cleanup(void *data);
+ #endif
+ 
+@@ -4339,9 +4344,15 @@ ngx_ssl_session_ticket_keys(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_array_t *paths)
+         return NGX_ERROR;
+     }
+ 
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
+     if (SSL_CTX_set_tlsext_ticket_key_cb(ssl->ctx,
+                                          ngx_ssl_session_ticket_key_callback)
+         == 0)
++#else
++    if (SSL_CTX_set_tlsext_ticket_key_evp_cb(ssl->ctx,
++                                         ngx_ssl_session_ticket_key_callback)
++        == 0)
++#endif
+     {
+         ngx_log_error(NGX_LOG_WARN, cf->log, 0,
+                       "nginx was built with Session Tickets support, however, "
+@@ -4368,7 +4379,12 @@ failed:
+ static int
+ ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
+     unsigned char *name, unsigned char *iv, EVP_CIPHER_CTX *ectx,
+-    HMAC_CTX *hctx, int enc)
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++    HMAC_CTX *hctx,
++#else
++    EVP_MAC_CTX *hctx,
++#endif
++    int enc)
+ {
+     size_t                         size;
+     SSL_CTX                       *ssl_ctx;
+@@ -4376,17 +4392,26 @@ ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
+     ngx_array_t                   *keys;
+     ngx_connection_t              *c;
+     ngx_ssl_session_ticket_key_t  *key;
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
+     const EVP_MD                  *digest;
++#else
++    OSSL_PARAM                     params[2];
++#endif
+     const EVP_CIPHER              *cipher;
+ 
+     c = ngx_ssl_get_connection(ssl_conn);
+     ssl_ctx = c->ssl->session_ctx;
+ 
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
+ #ifdef OPENSSL_NO_SHA256
+     digest = EVP_sha1();
+ #else
+     digest = EVP_sha256();
+ #endif
++#else
++    params[0] = OSSL_PARAM_construct_utf8_string("digest", "SHA256", 0);
++    params[1] = OSSL_PARAM_construct_end();
++#endif
+ 
+     keys = SSL_CTX_get_ex_data(ssl_ctx, ngx_ssl_session_ticket_keys_index);
+     if (keys == NULL) {
+@@ -4423,7 +4448,12 @@ ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
+             return -1;
+         }
+ 
+-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
++#if OPENSSL_VERSION_NUMBER >= 0x30000000L
++        if (EVP_MAC_init(hctx, key[0].hmac_key, size, params) != 1) {
++            ngx_ssl_error(NGX_LOG_ALERT, c->log, 0, "EVP_MAC_init() failed");
++            return -1;
++        }
++#elif OPENSSL_VERSION_NUMBER >= 0x10000000L
+         if (HMAC_Init_ex(hctx, key[0].hmac_key, size, digest, NULL) != 1) {
+             ngx_ssl_error(NGX_LOG_ALERT, c->log, 0, "HMAC_Init_ex() failed");
+             return -1;
+@@ -4466,7 +4496,12 @@ ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
+             size = 32;
+         }
+ 
+-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
++#if OPENSSL_VERSION_NUMBER >= 0x30000000L
++        if (EVP_MAC_init(hctx, key[i].hmac_key, size, params) != 1) {
++            ngx_ssl_error(NGX_LOG_ALERT, c->log, 0, "EVP_MAC_init() failed");
++            return -1;
++        }
++#elif OPENSSL_VERSION_NUMBER >= 0x10000000L
+         if (HMAC_Init_ex(hctx, key[i].hmac_key, size, digest, NULL) != 1) {
+             ngx_ssl_error(NGX_LOG_ALERT, c->log, 0, "HMAC_Init_ex() failed");
+             return -1;

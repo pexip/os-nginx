@@ -8,6 +8,7 @@
 #include <ngx_core.h>
 #include "ngx_rtmp.h"
 
+#include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
 
@@ -104,7 +105,12 @@ static ngx_int_t
 ngx_rtmp_make_digest(ngx_str_t *key, ngx_buf_t *src,
         u_char *skip, u_char *dst, ngx_log_t *log)
 {
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
     static HMAC_CTX        *hmac;
+#else
+    static EVP_MAC_CTX     *hmac;
+    OSSL_PARAM              params[2];
+#endif
     unsigned int            len;
 
     if (hmac == NULL) {
@@ -112,29 +118,62 @@ ngx_rtmp_make_digest(ngx_str_t *key, ngx_buf_t *src,
         static HMAC_CTX  shmac;
         hmac = &shmac;
         HMAC_CTX_init(hmac);
-#else
+#elif OPENSSL_VERSION_NUMBER < 0x30000000L
         hmac = HMAC_CTX_new();
+        if (hmac == NULL) {
+            return NGX_ERROR;
+        }
+#else
+        EVP_MAC *mac = EVP_MAC_fetch(NULL, "HMAC", NULL);
+        if (mac == NULL) {
+            return NGX_ERROR;
+        }
+	hmac = EVP_MAC_CTX_new(mac);
+        EVP_MAC_free(mac);
         if (hmac == NULL) {
             return NGX_ERROR;
         }
 #endif
     }
 
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
     HMAC_Init_ex(hmac, key->data, key->len, EVP_sha256(), NULL);
+#else
+    params[0] = OSSL_PARAM_construct_utf8_string("digest", "SHA256", 0);
+    params[1] = OSSL_PARAM_construct_end();
+    EVP_MAC_init(hmac, key->data, key->len, params);
+#endif
 
     if (skip && src->pos <= skip && skip <= src->last) {
         if (skip != src->pos) {
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
             HMAC_Update(hmac, src->pos, skip - src->pos);
+#else
+            EVP_MAC_update(hmac, src->pos, skip - src->pos);
+#endif
         }
         if (src->last != skip + NGX_RTMP_HANDSHAKE_KEYLEN) {
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
             HMAC_Update(hmac, skip + NGX_RTMP_HANDSHAKE_KEYLEN,
                     src->last - skip - NGX_RTMP_HANDSHAKE_KEYLEN);
+#else
+            EVP_MAC_update(hmac, skip + NGX_RTMP_HANDSHAKE_KEYLEN,
+                    src->last - skip - NGX_RTMP_HANDSHAKE_KEYLEN);
+#endif
         }
     } else {
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
         HMAC_Update(hmac, src->pos, src->last - src->pos);
+#else
+        EVP_MAC_update(hmac, src->pos, src->last - src->pos);
+#endif
     }
 
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
     HMAC_Final(hmac, dst, &len);
+#else
+    EVP_MAC_final(hmac, dst, &len, NGX_RTMP_HANDSHAKE_KEYLEN);
+#endif
 
     return NGX_OK;
 }
