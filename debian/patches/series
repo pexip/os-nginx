@@ -3,5 +3,6 @@
 CVE-2019-20372.patch
 Resolver-fixed-off-by-one-write-in-ngx_resolver_copy.patch
 CVE-2021-3618.patch
+CVE-2022-41741_CVE-2022-41742.patch
 pexip-add-ssl_trusted_ca_path.patch
 pexip-add-ssl_client_ca_path.patch
