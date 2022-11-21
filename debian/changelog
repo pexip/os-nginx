@@ -1,3 +1,9 @@
+nginx (1.18.0-6.1+deb11u3pexip2) pexip; urgency=medium
+
+  * Try again, with correct distribution.
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Mon, 21 Nov 2022 11:52:12 +0000
+
 nginx (1.18.0-6.1+deb11u3pexip1) pexip-bullseye; urgency=medium
 
   * New upstream release with security updates.
