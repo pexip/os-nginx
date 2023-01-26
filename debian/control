@@ -5,8 +5,9 @@ Maintainer: Pexip AS <packaging@pexip.com>
 XSBC-Pexip-Original-Maintainer: Debian Nginx Maintainers <pkg-nginx-maintainers@alioth-lists.debian.net>
 XSBC-Pexip-Original-Uploaders: Christos Trochalakis <ctrochalakis@debian.org>,
            Ondřej Nový <onovy@debian.org>,
-Build-Depends: debhelper-compat (= 12),
-               dpkg-dev (>= 1.15.5),
+           Thomas Ward <teward@ubuntu.com>,
+           Jan Mojžíš <jan.mojzis@gmail.com>,
+Build-Depends: debhelper-compat (= 13),
                libexpat-dev,
                libgeoip-dev,
                libhiredis-dev,
@@ -20,8 +21,8 @@ Build-Depends: debhelper-compat (= 12),
                po-debconf,
                quilt,
                zlib1g-dev
-Standards-Version: 4.5.0
-Homepage: https://nginx.net
+Standards-Version: 4.6.1
+Homepage: https://nginx.org
 Vcs-Git: https://salsa.debian.org/nginx-team/nginx.git
 Vcs-Browser: https://salsa.debian.org/nginx-team/nginx
 Rules-Requires-Root: no
@@ -55,7 +56,7 @@ Description: small, powerful, scalable web/proxy server - documentation
 Package: nginx-common
 Architecture: all
 Multi-Arch: foreign
-Depends: lsb-base (>= 3.0-6), ${misc:Depends}
+Depends: lsb-base, ${misc:Depends}
 Suggests: fcgiwrap, nginx-doc, ssl-cert
 Description: small, powerful, scalable web/proxy server - common files
  Nginx ("engine X") is a high-performance web and reverse proxy server
@@ -64,6 +65,31 @@ Description: small, powerful, scalable web/proxy server - common files
  .
  This package contains base configuration files used by all versions of
  nginx.
+
+Package: nginx-dev
+Architecture: all
+Depends: ${misc:Depends},
+         debhelper-compat (= 13),
+         dpkg-dev (>= 1.15.5),
+         libgd-dev,
+         libgeoip-dev,
+         libpcre3-dev,
+         libperl-dev,
+         libssl-dev,
+         libxslt1-dev,
+         po-debconf,
+         quilt,
+         zlib1g-dev,
+         nginx-core (<< ${source:Version}.1~) | nginx-light (<< ${source:Version}.1~) | nginx-extras (<< ${source:Version}.1~),
+         nginx-core (>= ${source:Version}) | nginx-light (>= ${source:Version}) | nginx-extras (>= ${source:Version})
+Description: nginx web/proxy server - development headers
+ Nginx ("engine X") is a high-performance web and reverse proxy server
+ created by Igor Sysoev. It can be used both as a standalone web server
+ and as a proxy to reduce the load on back-end HTTP or mail servers.
+ .
+ This package provides development headers and necessary config scripts
+ for the nginx web/proxy server, useful to develop and link third party
+ additions to the Debian nginx web/proxy server packages.
 
 Package: nginx-core
 Architecture: any
@@ -76,8 +102,7 @@ Depends: libnginx-mod-http-geoip (= ${binary:Version}),
          iproute2,
          ${misc:Depends},
          ${shlibs:Depends}
-Breaks: nginx (<< 1.4.5-1),
-        nginx-full (<< 1.18.0-1),
+Breaks: nginx-full (<< 1.18.0-1),
 Replaces: nginx-full (<< 1.18.0-1),
 Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-light, nginx-pexip
@@ -117,7 +142,6 @@ Depends: libnginx-mod-http-auth-pam,
          nginx-core (<< ${source:Version}.1~),
          ${misc:Depends},
          ${shlibs:Depends}
-Breaks: nginx (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
 Suggests: nginx-doc (= ${source:Version})
 Description: nginx web/proxy server (standard version with 3rd parties)
@@ -152,7 +176,6 @@ Depends: libnginx-mod-http-echo (= ${binary:Version}),
          iproute2,
          ${misc:Depends},
          ${shlibs:Depends}
-Breaks: nginx (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-extras, nginx-core, nginx-pexip
 Suggests: nginx-doc (= ${source:Version})
@@ -197,7 +220,6 @@ Depends: libnginx-mod-http-auth-pam (= ${binary:Version}),
          iproute2,
          ${misc:Depends},
          ${shlibs:Depends}
-Breaks: nginx (<< 1.4.5-1)
 Provides: httpd, httpd-cgi, nginx
 Conflicts: nginx-core, nginx-light, nginx-pexip
 Suggests: nginx-doc (= ${source:Version})
@@ -337,7 +359,6 @@ Package: libnginx-mod-http-perl
 Architecture: any
 Depends: ${misc:Depends}, ${perl:Depends}, ${shlibs:Depends},
 Recommends: nginx,
-Replaces: nginx-extras (<< 1.9.14-1)
 Description: Perl module for Nginx
  Embed Perl runtime into nginx.
  .
@@ -369,6 +390,22 @@ Description: Nginx Development Kit module
  have generic code as part of the core distribution. The NDK itself adds few
  features that are seen from a user's point of view - it's just designed to help
  reduce the code that Nginx module developers need to write.
+
+Package: libnginx-mod-http-ndk-dev
+Architecture: all
+Depends: libnginx-mod-http-ndk (<< ${source:Version}.1~), libnginx-mod-http-ndk (>= ${source:Version}),
+         nginx-dev (>= ${source:Version}), nginx-dev (<< ${source:Version}.1~), ${misc:Depends}
+Description: Nginx Development Kit module - development files
+ The NDK is an Nginx module that is designed to extend the core functionality of
+ the excellent Nginx webserver in a way that can be used as a basis of other
+ Nginx modules.
+ .
+ This package provides development headers and necessary config scripts
+ for the Nginx development kit module, useful to develop and link third party
+ additions to the Debian nginx web/proxy server packages using Nginx
+ development kit module.
+ .
+ Development files.
 
 Package: libnginx-mod-nchan
 Architecture: any
