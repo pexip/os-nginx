@@ -37,11 +37,9 @@ case "$1" in
       ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
     fi
 
-    # Create a default index page when not already present.
-    if [ ! -e /var/www/html/index.nginx-debian.html ]; then
-      mkdir -p /var/www/html
-      cp /usr/share/nginx/html/index.html /var/www/html/index.nginx-debian.html
-    fi
+    # Create default index page
+    mkdir -p /var/www/html
+    cp /usr/share/nginx/html/index.html /var/www/html/index.nginx-debian.html
 
     ;;
 
