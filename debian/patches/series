@@ -1,6 +1,5 @@
-0002-Make-sure-signature-stays-the-same-in-all-nginx-buil.patch
 0003-define_gnu_source-on-other-glibc-based-platforms.patch
-CVE-2019-20372.patch
-Resolver-fixed-off-by-one-write-in-ngx_resolver_copy.patch
-CVE-2021-3618.patch
-CVE-2022-41741_CVE-2022-41742.patch
+nginx-fix-pidfile.patch
+nginx-ssl_cert_cb_yield.patch
+bug-1024605.patch
+bug-973861.patch

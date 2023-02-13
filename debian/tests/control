@@ -1,29 +1,25 @@
 Tests: light-simple
-Restrictions: allow-stderr isolation-container
+Restrictions: allow-stderr isolation-container needs-root
 Depends: nginx-light, curl
 
 Tests: ec-x25519
 Restrictions: allow-stderr isolation-container needs-root
 Depends: nginx-light, ssl-cert, curl
 
-Tests: lua
-Restrictions: allow-stderr isolation-container needs-root
-Depends: nginx-extras, curl
-
 Tests: core-simple
-Restrictions: allow-stderr isolation-container
+Restrictions: allow-stderr isolation-container needs-root
 Depends: nginx-core, curl
 
 Tests: full-simple
-Restrictions: allow-stderr isolation-container
+Restrictions: allow-stderr isolation-container needs-root
 Depends: nginx-full, curl
 
 Tests: extras-simple
-Restrictions: allow-stderr isolation-container
+Restrictions: allow-stderr isolation-container needs-root
 Depends: nginx-extras, curl
 
 Tests: core-module-deps
-Restrictions: allow-stderr isolation-container
+Restrictions: allow-stderr isolation-container needs-root
 Depends: nginx-core,
          curl,
          libnginx-mod-http-auth-pam,
@@ -35,7 +31,7 @@ Depends: nginx-core,
          libnginx-mod-http-geoip2,
          libnginx-mod-http-headers-more-filter,
          libnginx-mod-http-image-filter,
-         libnginx-mod-http-lua,
+         libnginx-mod-http-lua [amd64 arm64 armel armhf i386 mips64el mipsel s390x powerpc],
          libnginx-mod-http-perl,
          libnginx-mod-http-subs-filter,
          libnginx-mod-http-uploadprogress,
@@ -47,9 +43,14 @@ Depends: nginx-core,
          libnginx-mod-stream-geoip,
          libnginx-mod-stream-geoip2,
          libnginx-mod-stream,
+         libnginx-mod-http-set-misc,
+         libnginx-mod-http-brotli-filter,
+         libnginx-mod-http-brotli-static,
+         libnginx-mod-http-memc,
+         libnginx-mod-http-srcache-filter,
 
 Tests: full-module-deps
-Restrictions: allow-stderr isolation-container
+Restrictions: allow-stderr isolation-container needs-root
 Depends: nginx-full,
          curl,
          libnginx-mod-http-auth-pam,
@@ -61,7 +62,7 @@ Depends: nginx-full,
          libnginx-mod-http-geoip2,
          libnginx-mod-http-headers-more-filter,
          libnginx-mod-http-image-filter,
-         libnginx-mod-http-lua,
+         libnginx-mod-http-lua [amd64 arm64 armel armhf i386 mips64el mipsel s390x powerpc],
          libnginx-mod-http-perl,
          libnginx-mod-http-subs-filter,
          libnginx-mod-http-uploadprogress,
@@ -73,9 +74,14 @@ Depends: nginx-full,
          libnginx-mod-stream-geoip,
          libnginx-mod-stream-geoip2,
          libnginx-mod-stream,
+         libnginx-mod-http-set-misc,
+         libnginx-mod-http-brotli-filter,
+         libnginx-mod-http-brotli-static,
+         libnginx-mod-http-memc,
+         libnginx-mod-http-srcache-filter,
 
 Tests: light-module-deps
-Restrictions: allow-stderr isolation-container
+Restrictions: allow-stderr isolation-container needs-root
 Depends: nginx-light,
          curl,
          libnginx-mod-http-auth-pam,
@@ -87,7 +93,7 @@ Depends: nginx-light,
          libnginx-mod-http-geoip2,
          libnginx-mod-http-headers-more-filter,
          libnginx-mod-http-image-filter,
-         libnginx-mod-http-lua,
+         libnginx-mod-http-lua [amd64 arm64 armel armhf i386 mips64el mipsel s390x powerpc],
          libnginx-mod-http-perl,
          libnginx-mod-http-subs-filter,
          libnginx-mod-http-uploadprogress,
@@ -99,9 +105,14 @@ Depends: nginx-light,
          libnginx-mod-stream-geoip,
          libnginx-mod-stream-geoip2,
          libnginx-mod-stream,
+         libnginx-mod-http-set-misc,
+         libnginx-mod-http-brotli-filter,
+         libnginx-mod-http-brotli-static,
+         libnginx-mod-http-memc,
+         libnginx-mod-http-srcache-filter,
 
 Tests: extras-module-deps
-Restrictions: allow-stderr isolation-container
+Restrictions: allow-stderr isolation-container needs-root
 Depends: nginx-extras,
          curl,
          libnginx-mod-http-auth-pam,
@@ -113,7 +124,7 @@ Depends: nginx-extras,
          libnginx-mod-http-geoip2,
          libnginx-mod-http-headers-more-filter,
          libnginx-mod-http-image-filter,
-         libnginx-mod-http-lua,
+         libnginx-mod-http-lua [amd64 arm64 armel armhf i386 mips64el mipsel s390x powerpc],
          libnginx-mod-http-perl,
          libnginx-mod-http-subs-filter,
          libnginx-mod-http-uploadprogress,
@@ -125,3 +136,16 @@ Depends: nginx-extras,
          libnginx-mod-stream-geoip,
          libnginx-mod-stream-geoip2,
          libnginx-mod-stream,
+         libnginx-mod-http-set-misc,
+         libnginx-mod-http-brotli-filter,
+         libnginx-mod-http-brotli-static,
+         libnginx-mod-http-memc,
+         libnginx-mod-http-srcache-filter,
+
+Tests: reboot
+Restrictions: isolation-container, needs-root, needs-reboot
+Depends: nginx-light, curl
+
+Tests: ssi-module-test
+Restrictions: allow-stderr, isolation-container, needs-root,
+Depends: nginx, nginx-core, curl
