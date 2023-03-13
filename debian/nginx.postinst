@@ -1,0 +1,76 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+case "$1" in
+  configure)
+    logdir="/var/log/nginx"
+
+    # Allow local admin to override
+    if ! dpkg-statoverride --list "$logdir" >/dev/null; then
+      chown root:adm $logdir
+      chmod 0755 $logdir
+    fi
+
+    # Secure default logfiles on fresh installations
+    if [ -z "$2" ]; then
+      access_log="$logdir/access.log"
+      error_log="$logdir/error.log"
+
+      if [ ! -e "$access_log" ]; then
+        touch "$access_log"
+        chmod 640 "$access_log"
+        chown www-data:adm "$access_log"
+      fi
+
+      if [ ! -e "$error_log" ]; then
+        touch "$error_log"
+        chmod 640 "$error_log"
+        chown www-data:adm "$error_log"
+      fi
+    fi
+
+    # If a symlink doesn't exist and can be created, then create it.
+    if [ -z $2 ] && [ ! -e /etc/nginx/sites-enabled/default ] &&
+       [ -d /etc/nginx/sites-enabled ] && [ -d /etc/nginx/sites-available ]; then
+      ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+    fi
+
+    # Create default index page
+    mkdir -p /var/www/html
+    cp /usr/share/nginx/html/index.html /var/www/html/index.nginx-debian.html
+    ;;
+
+  triggered)
+    if invoke-rc.d --quiet nginx status >/dev/null; then
+      echo "Triggering nginx reload ..."
+      invoke-rc.d nginx reload || true
+    fi
+    exit 0
+    ;;
+
+  abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+  *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+    ;;
+esac
+
+if invoke-rc.d --quiet nginx status >/dev/null; then
+  invoke-rc.d nginx upgrade || invoke-rc.d nginx restart
+  exit $?
+else
+  if [ -z "$(ss -nlt 'sport = 80' | grep -v ^State)" ]; then
+    invoke-rc.d nginx start || exit $?
+  else
+    echo "Not attempting to start NGINX, port 80 is already in use."
+    exit 0
+  fi
+fi
+
+#DEBHELPER#
+
+exit 0

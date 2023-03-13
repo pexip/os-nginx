@@ -1,8 +1,11 @@
-Description: SSL: handled SSL_CTX_set_cert_cb() callback yielding.
-Author: Yichun Zhang <agentzh@openresty.org>
-Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884434
-Origin: https://raw.githubusercontent.com/openresty/openresty/v1.11.2.2/patches/nginx-1.11.2-ssl_cert_cb_yield.patch
-Last-Update: 2016-01-02
+Origin: https://github.com/openresty/openresty/blob/master/patches/nginx-1.21.4-ssl_cert_cb_yield.patch
+# HG changeset patch
+# User Yichun Zhang <agentzh@openresty.org>
+# Date 1451762084 28800
+#      Sat Jan 02 11:14:44 2016 -0800
+# Node ID 449f0461859c16e95bdb18e8be6b94401545d3dd
+# Parent  78b4e10b4367b31367aad3c83c9c3acdd42397c4
+SSL: handled SSL_CTX_set_cert_cb() callback yielding.
 
 OpenSSL 1.0.2+ introduces SSL_CTX_set_cert_cb() to allow custom
 callbacks to serve the SSL certificiates and private keys dynamically
@@ -11,10 +14,9 @@ Here we added support for such usage in NGINX 3rd-party modules
 (like ngx_lua) in NGINX's event handlers for downstream SSL
 connections.
 
-diff -r 78b4e10b4367 -r 449f0461859c src/event/ngx_event_openssl.c
---- a/src/event/ngx_event_openssl.c	Thu Dec 17 16:39:15 2015 +0300
-+++ b/src/event/ngx_event_openssl.c	Sat Jan 02 11:14:44 2016 -0800
-@@ -1210,6 +1210,23 @@
+--- a/src/event/ngx_event_openssl.c
++++ b/src/event/ngx_event_openssl.c
+@@ -1832,6 +1832,23 @@
          return NGX_AGAIN;
      }
  
@@ -38,3 +40,25 @@ diff -r 78b4e10b4367 -r 449f0461859c src/event/ngx_event_openssl.c
      err = (sslerr == SSL_ERROR_SYSCALL) ? ngx_errno : 0;
  
      c->ssl->no_wait_shutdown = 1;
+@@ -1968,6 +1985,21 @@
+         c->read->handler = ngx_ssl_handshake_handler;
+         c->write->handler = ngx_ssl_handshake_handler;
+ 
++        if (ngx_handle_read_event(c->read, 0) != NGX_OK) {
++            return NGX_ERROR;
++        }
++
++        if (ngx_handle_write_event(c->write, 0) != NGX_OK) {
++            return NGX_ERROR;
++        }
++
++        return NGX_AGAIN;
++    }
++
++    if (sslerr == SSL_ERROR_WANT_X509_LOOKUP) {
++        c->read->handler = ngx_ssl_handshake_handler;
++        c->write->handler = ngx_ssl_handshake_handler;
++
+         if (ngx_handle_read_event(c->read, 0) != NGX_OK) {
+             return NGX_ERROR;
+         }

@@ -5,11 +5,9 @@ Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=876365
 Last-Update: 2020-06-24
 ---
 This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
-diff --git a/src/core/nginx.c b/src/core/nginx.c
-index 9fcb0eb2..083eba1d 100644
 --- a/src/core/nginx.c
 +++ b/src/core/nginx.c
-@@ -338,14 +338,21 @@ main(int argc, char *const *argv)
+@@ -339,14 +339,21 @@
          ngx_process = NGX_PROCESS_MASTER;
      }
  
@@ -32,7 +30,7 @@ index 9fcb0eb2..083eba1d 100644
              return 1;
          }
  
-@@ -358,8 +365,19 @@ main(int argc, char *const *argv)
+@@ -359,8 +366,19 @@
  
  #endif
  
@@ -54,8 +52,6 @@ index 9fcb0eb2..083eba1d 100644
      }
  
      if (ngx_log_redirect_stderr(cycle) != NGX_OK) {
-diff --git a/src/os/unix/ngx_daemon.c b/src/os/unix/ngx_daemon.c
-index 385c49b6..3719854c 100644
 --- a/src/os/unix/ngx_daemon.c
 +++ b/src/os/unix/ngx_daemon.c
 @@ -7,14 +7,17 @@
@@ -77,7 +73,7 @@ index 385c49b6..3719854c 100644
      case -1:
          ngx_log_error(NGX_LOG_EMERG, log, ngx_errno, "fork() failed");
          return NGX_ERROR;
-@@ -23,7 +26,8 @@ ngx_daemon(ngx_log_t *log)
+@@ -23,7 +26,8 @@
          break;
  
      default:

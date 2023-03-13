@@ -1,3 +1,130 @@
+nginx (1.22.1-7) unstable; urgency=medium
+
+  * nginx ABI release: nginx-abi-1.22.1-7
+  * nginx ABI: Nginx now provides nginx-abi-<VERSION> to better manage
+    dependencies between nginx and 3rd party modules. Credit to Jérémy Lal.
+  * switched to libpcre2 (Closes: 1000013)
+  * d/p/bug-973861: added, lingering close for connections with pipelined
+    requests. The patch is backported from the upstream. (Closes: 973861)
+  * d/gbb.conf: switched to debian branch main (debian-branch = main)
+  * d/copyright: updated to be compatible with 'cme update dpkg-copyright'
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Mon, 13 Feb 2023 13:04:16 +0100
+
+nginx (1.22.1-6) unstable; urgency=medium
+
+  * Main change:
+    Nginx binary moved to package nginx, also moved basic
+    configuration files from nginx-common to package nginx.
+    The packages nginx-{light,core,extras,common} are replaced
+    by a metapackage. (Closes: 1025763)
+    Users should simply install 'nginx' and 'libnginx-mod-...'
+    instead of these packages.
+  * Additional changes:
+    * d/nginx-{light,core,extras,full,common}.NEWS: added warning that
+      nginx-{light,core,extras,full,common} are deprecated
+    * d/control: fixed dependencies for safe binNMU
+    * d/copyright: updated debian/* copyright
+    * d/copyright: added missing copyright for d/apport/*
+    * d/copyright: added missing GPL-2+ copyright for d/debhelper/dh_nginx
+    * d/copyright: added missing copyright for d/help/examples/nginx_modsite
+    * d/po/it.po: added Italian debconf translation. (Closes: 1019160)
+    * d/control: removed dependency on obsolete package lsb-base
+    * d/control: bump Standards-Version: 4.6.2, no changes
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Wed, 08 Feb 2023 17:20:27 +0100
+
+nginx (1.22.1-5) unstable; urgency=medium
+
+  [ Jan Mojžíš ]
+  * Since version 1.22.1-5 all third party modules are removed from Debian NGINX
+    package and all these modules are maintained in separate external packages.
+    Removed namely these remaining modules:
+      - libnginx-mod-http-geoip2
+      - libnginx-mod-stream-geoip2
+      - libnginx-mod-http-auth-pam
+      - libnginx-mod-http-echo
+      - libnginx-mod-http-upstream-fair
+      - libnginx-mod-http-headers-more-filter
+      - libnginx-mod-http-cache-purge
+      - libnginx-mod-http-fancyindex
+      - libnginx-mod-http-uploadprogress
+      - libnginx-mod-http-subs-filter
+      - libnginx-mod-http-dav-ext
+  * d/tests: all *-simple and *-deps tests updated to check if nginx works
+    after installation/reload/restart for all flavours
+  * d/control: updated nginx-common dependency, fixes lintian warning
+    maybe-not-arch-all-binnmuable
+
+  [ Jérémy Lal ]
+  * d/rules: default error-log-path is stderr (--error-log-path=stderr)
+    instead of hardcoded /var/log/nginx/error.log (Closes: 1025858)
+  * dh nginx: auto-detect build-dependency on ndk-dev
+  * dh nginx: absolute /usr/sbin/nginx path for nginx tests
+  * d/p/nginx-ssl_cert_cb_yield.patch SSL_CTX_set_cert_cb() callback yielding
+    patch update
+  * d/conf/nginx.conf: Set global error_log to /var/log/error.log
+    Now that error_log default value is stderr, it is possible
+    to override that config using nginx -g 'error_log stderr;'
+
+  [ Miao Wang ]
+  * d/control: removed unnecessary dependencies after removing 3rd party modules
+  * d/rules: enabled stream_realip_module (--with-stream_realip_module)
+  * d/rules: explicitly disabled pcre2 (--without-pcre2)
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Tue, 20 Dec 2022 10:36:19 +0100
+
+nginx (1.22.1-4) unstable; urgency=medium
+
+  * d/t/*-module-deps: updated, added curl timeout 300 seconds and
+    added nginx restart before calling curl
+  * d/t/*-module-deps: update:
+    - added tests for new ext. module libnginx-mod-http-set-misc
+    - added tests for new ext. module libnginx-mod-http-brotli-filter
+    - added tests for new ext. module libnginx-mod-http-brotli-static
+    - added tests for new ext. module libnginx-mod-http-memc
+    - added tests for new ext. module libnginx-mod-http-srcache-filter
+  * removed 3th party modules and moved to separate packages:
+    - libnginx-mod-nchan module
+    - libnginx-mod-rtmp module
+    - libnginx-mod-http-ndk module
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Thu, 08 Dec 2022 14:15:15 +0100
+
+nginx (1.22.1-3) unstable; urgency=medium
+
+  * d/control: added Multi-Arch: foreign for package nginx-dev
+  * d/rules: enabled NDK upstream list module NDK_UPSTREAM_LIST
+  * d/p/bug-1024605.patch: added header Forwarded: not-needed
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Mon, 05 Dec 2022 18:25:16 +0100
+
+nginx (1.22.1-2) unstable; urgency=medium
+
+  [ Jan Mojžíš ]
+  * d/control: fixed spelling-error-in-description
+  * d/nginx-*.postinst: fixed postinst script, used invoke-rc.d instead of
+    pidof and ad-hoc tests, tnx Gioele Barabucci
+  * d/tests/ssi-module-test added, simple ngx_http_ssi_filter_module test
+  * d/p/bug-1024605.patch added: fixes problem when a subrequest has SSI
+    enabled but its main request does not, the SSI module may crash the worker
+    due to NULL-pointer dereference. The patch is backported from the upstream
+    (Closes: 1024605)
+  * d/control: updated implicit dependencies of third-party modules
+    for easier transition to third-party modules in separate packages.
+
+  [ Jérémy Lal ]
+  * d/debhelper: set nginx_mod buildsystem by default
+  * d/control: nginx-dev provides dh-sequence-nginx (Closes: #1024879)
+  * d/control: remove Uploaders that are part of nginx-team,
+    keep only the most recent active one, per policy 5.6.3.
+
+  [ Debian Janitor ]
+  * Remove constraints unnecessary since buster (oldstable):
+    + nginx-dev: Drop versioned constraint on dpkg-dev in Depends.
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Wed, 30 Nov 2022 17:39:42 +0100
+
 nginx (1.22.1-1pexip3) pexip; urgency=medium
 
   * nginx-common: unilaterally install current default index page
@@ -17,6 +144,19 @@ nginx (1.22.1-1pexip1) pexip-bullseye-openssl3; urgency=medium
   * Remove lua module
 
  -- John-Mark Bell <jmb@pexip.com>  Tue, 15 Nov 2022 18:44:51 +0000
+
+nginx (1.22.1-1) unstable; urgency=medium
+
+  [ Jan Mojžíš ]
+  * New upstream version 1.22.1
+  * d/control: added implicit version of dependency libnginx-mod-http-lua
+    (>=1:0.10.22-3~), it is a rebuilt version with nginx 1.22.1.
+  * Added libnginx-mod-http-lua powerpc architecture
+
+  [ Debian Janitor ]
+  * Fix day-of-week for changelog entry 0.5.11-1.
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Thu, 10 Nov 2022 18:21:43 +0100
 
 nginx (1.22.1-1) unstable; urgency=medium
 

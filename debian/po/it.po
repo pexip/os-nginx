@@ -1,29 +1,26 @@
-# Nginx debconf translation to Dutch
+# Nginx debconf translations
 # Copyright (C) 2016 Christos Trochalakis
 # This file is distributed under the same license as the nginx package.
-# Chrirtos Trochalakis <yatiohi@ideopolis.gr>, 2016.
-# Frans Spiesschaert <Frans.Spiesschaert@yucom.be>, 2016.
+# Christos Trochalakis <ctrochalakis@debian.org>, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: nginx\n"
 "Report-Msgid-Bugs-To: nginx@packages.debian.org\n"
 "POT-Creation-Date: 2016-10-04 20:03+0300\n"
-"PO-Revision-Date: 2016-11-08 16:30+0100\n"
-"Last-Translator: Frans Spiesschaert <Frans.Spiesschaert@yucom.be>\n"
-"Language-Team: Debian Dutch l10n Team <debian-l10n-dutch@lists.debian.org>\n"
-"Language: nl\n"
+"PO-Revision-Date: 2022-08-25 00:00+0000\n"
+"Last-Translator: Ceppo <ceppo@oziosi.org>\n"
+"Language-Team: Italian <debian-l10n-italian@lists.debian.org>\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Gtranslator 2.91.6\n"
 
 #. Type: note
 #. Description
 #: ../nginx.templates:1001
 msgid "Possible insecure nginx log files"
-msgstr "Wellicht onveilige nginx logbestanden"
+msgstr "Documenti di log di nginx potenzialmente non sicuri"
 
 #. Type: note
 #. Description
@@ -32,8 +29,8 @@ msgid ""
 "The following log files under /var/log/nginx directory are symlinks owned by "
 "www-data:"
 msgstr ""
-"De volgende logbestanden in de map /var/log/nginx zijn symbolische "
-"koppelingen met www-data als eigenaar:"
+"I seguenti documenti di log nel percorso /var/log/nginx sono collegamenti "
+"simbolici (symlink) posseduti da www-data:"
 
 #. Type: note
 #. Description
@@ -51,10 +48,9 @@ msgid ""
 "are now fixed it is possible that such insecure links already exist. So, "
 "please make sure to check the above locations."
 msgstr ""
-"Sinds nginx 1.4.4-4 was www-data eigenaar van /var/log/nginx. Als gevolg "
-"daarvan kon www-data een symbolische koppeling maken tussen logbestanden en "
-"gevoelige plaatsen, hetgeen op zijn beurt kon leiden tot aanvallen van het "
-"type rechtenuitbreiding (privilege escalation). De toegangsrechten voor /var/"
-"log/nginx zijn nu gerepareerd, maar het is mogelijk dat er reeds dergelijke "
-"onveilige koppelingen bestaan. U moet dus zeker bovenstaande locaties "
-"controleren."
+"Da nginx 1.4.4-4 /var/log/nginx era posseduto da www-data. Di conseguenza "
+"www-data poteva creare collegamenti simbolici (symlink) a documenti di log "
+"in percorsi sensibili, il che a sua volta poteva portare ad attacchi di "
+"usurpazione di privilegi. Sebbene i permessi di /var/log/nginx siano adesso "
+"corretti è possibile che questi link non sicuri esistano già. Quindi, "
+"controllare i percorsi indicati sopra."

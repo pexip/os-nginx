@@ -1,6 +1,8 @@
 0003-define_gnu_source-on-other-glibc-based-platforms.patch
 nginx-fix-pidfile.patch
 nginx-ssl_cert_cb_yield.patch
+bug-1024605.patch
+bug-973861.patch
 pexip-add-ssl_trusted_ca_path.patch
 pexip-add-ssl_client_ca_path.patch
 openssl3-deprecations.patch

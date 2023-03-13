@@ -23,17 +23,28 @@
 use strict;
 use File::Find;
 use Debian::Debhelper::Dh_Lib;
-
+use Dpkg::Substvars;
 
 =head1 NAME
 
 dh_nginx - register configuration snippets to the nginx web server
 
 =cut
-
+my $nginx_in_tree;
+my $abi;
 sub nginx_depends
 {
-	return 'nginx-common (= ${source:Version})'
+	if (!$abi) {
+		my $sv = Dpkg::Substvars->new();
+		if ($nginx_in_tree) {
+			$sv->load("debian/libnginx-mod.abisubstvars");
+		}
+		else {
+			$sv->load("/usr/share/nginx/src/debian/libnginx-mod.abisubstvars");
+		}
+		$abi = $sv->get("nginx:abi");
+	}
+	return "$abi";
 }
 
 sub nginx_api_installdir
@@ -161,8 +172,6 @@ dh_nginx is heavily influnced by dh_apache2 written by Arno Toell
 ## main code starts here
 ##
 
-my $nginx_in_tree;
-
 init(options => {
 	"e|noenable" => \$dh{NOENABLE},
 	"in-nginx-tree" => \$nginx_in_tree,
@@ -268,30 +277,24 @@ foreach my $package ((@{$dh{DOPACKAGES}}))
 		}
 	}
 
-        my @postinst_autoscripts;
+	my @postinst_autoscripts;
 
-        if ($#{$PACKAGE_TYPE{'has_a_module'}} >= 0)
-        {
-                if ($package !~ m/libnginx-mod-\w+?/)
-                {
-                        warning("Package $package appears to be an Nginx module. It should comply to the package naming scheme libnginx-mod-<modulename>\n");
-                }
-                if ($nginx_in_tree){
-                            addsubstvar($package, "misc:Depends", nginx_depends());
-                } else {
-                            my $ngx_ver = `grep 'define NGINX_VERSION' /usr/share/nginx/src/src/core/nginx.h | sed -e 's/^.*"\\(.*\\)".*/\\1/'`;
-                            chomp($ngx_ver);
-                            addsubstvar($package, "misc:Depends", "nginx-common (>= $ngx_ver), nginx-common (<< $ngx_ver.1~)");
-                }
+	if ($#{$PACKAGE_TYPE{'has_a_module'}} >= 0)
+	{
+		if ($package !~ m/libnginx-mod-\w+?/)
+		{
+			warning("Package $package appears to be an Nginx module. It should comply to the package naming scheme libnginx-mod-<modulename>\n");
+		}
+		addsubstvar($package, "misc:Depends", nginx_depends());
 
-                my $modules = "";
-                foreach my $module (@{$PACKAGE_TYPE{'has_a_module'}})
-                {
-                        $modules .= "$module ";
-                }
+		my $modules = "";
+		foreach my $module (@{$PACKAGE_TYPE{'has_a_module'}})
+		{
+			$modules .= "$module ";
+		}
 
-                push @postinst_autoscripts, ["module", $modules];
-        }
+		push @postinst_autoscripts, ["module", $modules];
+	}
 
 	if (! $dh{NOSCRIPTS})
 	{
