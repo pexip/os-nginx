@@ -1,3 +1,10 @@
+nginx (1.22.1-7pexip1) pexip; urgency=medium
+
+  * New upstream release
+  * Rebuild nginx-pexip flavour
+
+ -- Huw Jones <huw@pexip.com>  Mon, 13 Mar 2023 16:46:26 +0000
+
 nginx (1.22.1-7) unstable; urgency=medium
 
   * nginx ABI release: nginx-abi-1.22.1-7

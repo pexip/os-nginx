@@ -42,8 +42,8 @@ Depends: ${misc:Depends},
          ${shlibs:Depends},
          iproute2,
 Conflicts: nginx
-Breaks: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~), nginx-common (<< 1.22.1-6~), nginx-pexip (<< 1.22.1-6~),
-Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~), nginx-common (<< 1.22.1-6~), nginx-pexip (<< 1.22.1-6~),
+Breaks: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~), nginx-common (<< 1.22.1-6~)
+Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~), nginx-common (<< 1.22.1-6~)
 Suggests: fcgiwrap, nginx-doc, ssl-cert
 Provides: httpd, httpd-cgi, ${nginx:abi}
 Description: nginx web/proxy server (basic version)
