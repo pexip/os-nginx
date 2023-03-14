@@ -18,13 +18,13 @@ msgstr ""
 
 #. Type: note
 #. Description
-#: ../nginx.templates:1001
+#: ../nginx-common.templates:1001
 msgid "Possible insecure nginx log files"
 msgstr "Nginx-logfilerne er muligvis usikre"
 
 #. Type: note
 #. Description
-#: ../nginx.templates:1001
+#: ../nginx-common.templates:1001
 msgid ""
 "The following log files under /var/log/nginx directory are symlinks owned by "
 "www-data:"
@@ -34,13 +34,13 @@ msgstr ""
 
 #. Type: note
 #. Description
-#: ../nginx.templates:1001
+#: ../nginx-common.templates:1001
 msgid "${logfiles}"
 msgstr "${logfiles}"
 
 #. Type: note
 #. Description
-#: ../nginx.templates:1001
+#: ../nginx-common.templates:1001
 msgid ""
 "Since nginx 1.4.4-4 /var/log/nginx was owned by www-data. As a result www-"
 "data could symlink log files to sensitive locations, which in turn could "

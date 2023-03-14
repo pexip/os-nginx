@@ -1,13 +1,3 @@
-nginx-common (1.22.1-6) unstable; urgency=medium
-
-  The packages nginx-common deprecated.
-  Package no longer distribute the configuration files and is replaced
-  by a metapackage to keep upgrades smooth.
-  Please simply install 'nginx' and 'libnginx-mod-...' modules You need
-  instead of these packages.
-
- -- Jan Mojžíš <jan.mojzis@gmail.com>  Wed, 11 Jan 2023 20:23:22 +0100
-
 nginx-common (1.10.2-4) unstable; urgency=medium
 
   Since nginx 1.9.14 Debian has gradually switched to dynamic loadable modules

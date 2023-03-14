@@ -95,13 +95,13 @@ override_dh_install:
 	DH_AUTOSCRIPTDIR=$(CURDIR)/debian/autoscripts debian/debhelper/dh_nginx --in-nginx-tree
 
 override_dh_installinit:
-	dh_installinit --package nginx --no-stop-on-upgrade --no-start --name=nginx
+	dh_installinit --no-stop-on-upgrade --no-start --name=nginx
 
-#override_dh_installsystemd:
-#	dh_installsystemd --package nginx --name=nginx
-#
-#override_dh_installlogrotate:
-#	dh_installlogrotate --package nginx --name=nginx
+override_dh_installsystemd:
+	dh_installsystemd --name=nginx
+
+override_dh_installlogrotate:
+	dh_installlogrotate --package nginx-common --name=nginx
 
 override_dh_gencontrol:
 	dh_gencontrol -- -Tdebian/substvars -Tdebian/libnginx-mod.abisubstvars
