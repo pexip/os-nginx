@@ -1,3 +1,9 @@
+nginx (1.22.1-7pexip2) pexip; urgency=medium
+
+  * Fix nginx-pexip build
+
+ -- Huw Jones <huw@pexip.com>  Thu, 16 Mar 2023 17:04:55 +0000
+
 nginx (1.22.1-7pexip1) pexip; urgency=medium
 
   * New upstream release
