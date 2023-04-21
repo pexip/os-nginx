@@ -9,7 +9,7 @@ import os
 import subprocess
 
 def add_info(report, ui):
-    if (report['Package'].split()[0] != 'nginx'
+    if (report['Package'].split()[0] != 'nginx-common'
         and report['ProblemType'] == 'Package'
         and os.path.isdir('/run/systemd/system')):
         report['Journalctl_Nginx.txt'] = apport.hookutils.command_output(

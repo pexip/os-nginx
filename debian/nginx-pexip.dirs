@@ -1,12 +1,3 @@
 usr/sbin
-etc/nginx
-etc/nginx/conf.d
-etc/nginx/modules-available
-etc/nginx/modules-enabled
-etc/nginx/sites-available
-etc/nginx/sites-enabled
 etc/nginx/streams-available
 etc/nginx/streams-enabled
-usr/share/nginx
-var/lib/nginx
-var/log/nginx

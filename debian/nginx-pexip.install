@@ -1,4 +1,1 @@
 debian/build-pexip/objs/nginx usr/sbin
-debian/conf/* etc/nginx
-html/index.html usr/share/nginx/html/
-debian/nginx.service lib/systemd/system/

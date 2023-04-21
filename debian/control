@@ -26,10 +26,11 @@ Architecture: any
 Depends: ${misc:Depends},
          ${shlibs:Depends},
          iproute2,
+         nginx-common (<< ${source:Version}.1~),
+         nginx-common (>= ${source:Version}),
 Conflicts: nginx-pexip
-Breaks: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~), nginx-common (<< 1.22.1-6~)
-Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~), nginx-common (<< 1.22.1-6~)
-Suggests: fcgiwrap, nginx-doc, ssl-cert
+Breaks: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~),
+Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~),
 Provides: httpd, httpd-cgi, ${nginx:abi}
 Description: small, powerful, scalable web/proxy server
  Nginx ("engine X") is a high-performance web and reverse proxy server
@@ -41,9 +42,11 @@ Architecture: any
 Depends: ${misc:Depends},
          ${shlibs:Depends},
          iproute2,
+         nginx-common (<< ${source:Version}.1~),
+         nginx-common (>= ${source:Version}),
 Conflicts: nginx
-Breaks: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~), nginx-common (<< 1.22.1-6~)
-Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~), nginx-common (<< 1.22.1-6~)
+Breaks: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~),
+Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~),
 Suggests: fcgiwrap, nginx-doc, ssl-cert
 Provides: httpd, httpd-cgi, ${nginx:abi}
 Description: nginx web/proxy server (basic version)
@@ -69,18 +72,19 @@ Description: small, powerful, scalable web/proxy server - documentation
  This package provides extra documentation to help unleash the power of Nginx.
 
 Package: nginx-common
+Breaks: nginx (<< 1.22.1-8)
+Replaces: nginx (<< 1.22.1-8)
 Architecture: all
 Multi-Arch: foreign
-Depends: ${misc:Depends},
-         nginx (<< ${source:Version}.1~),
-         nginx (>= ${source:Version}),
+Depends: ${misc:Depends}
+Suggests: fcgiwrap, nginx-doc, ssl-cert
 Description: small, powerful, scalable web/proxy server - common files
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
  and as a proxy to reduce the load on back-end HTTP or mail servers.
  .
- From nginx version 1.22.1-6 changed to dependency metapackage,
- can be safely removed.
+ This package contains base configuration files used by all versions of
+ nginx.
 
 Package: nginx-dev
 Architecture: all
@@ -142,13 +146,13 @@ Description: nginx web/proxy server (standard version)
 
 Package: nginx-full
 Architecture: all
-Depends: libnginx-mod-http-auth-pam,
-         libnginx-mod-http-dav-ext,
-         libnginx-mod-http-echo,
-         libnginx-mod-http-geoip2,
-         libnginx-mod-http-subs-filter,
-         libnginx-mod-http-upstream-fair,
-         libnginx-mod-stream-geoip2,
+Depends: libnginx-mod-http-auth-pam (>= ${libnginx-mod-http-auth-pam:Version}~),
+         libnginx-mod-http-dav-ext (>= ${libnginx-mod-http-dav-ext:Version}~),
+         libnginx-mod-http-echo (>= ${libnginx-mod-http-echo:Version}~),
+         libnginx-mod-http-geoip2 (>= ${libnginx-mod-geoip2:Version}~),
+         libnginx-mod-http-subs-filter (>= ${libnginx-mod-http-subs-filter:Version}~),
+         libnginx-mod-http-upstream-fair (>= ${libnginx-mod-http-upstream-fair:Version}~),
+         libnginx-mod-stream-geoip2 (>= ${libnginx-mod-geoip2:Version}~),
          nginx (>= ${source:Version}),
          nginx (<< ${source:Version}.1~),
          ${misc:Depends},

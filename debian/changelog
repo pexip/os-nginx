@@ -1,3 +1,21 @@
+nginx (1.22.1-9) unstable; urgency=medium
+
+  * d/control: nginx-common Breaks+Replaces: nginx (<< 1.22.1-8)
+    (Closes: 1032929)
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Tue, 14 Mar 2023 16:19:32 +0100
+
+nginx (1.22.1-8) unstable; urgency=medium
+
+  * Main change:
+    Configuration files returned to nginx-common package. This fixes
+    the serious problem of losing configuration files during upgrade.
+    This is a rollback of a change made in 1.22.1-6 (Closes: 1032517)
+  * d/control: fix nginx-full dependencies
+  * d/libnginx-mod.abisubstvars: update libnginx-mod-http-lua version
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Tue, 14 Mar 2023 06:53:32 +0100
+
 nginx (1.22.1-7pexip2) pexip; urgency=medium
 
   * Fix nginx-pexip build
