@@ -181,8 +181,72 @@
      ngx_str_t        crl;
 --- a/src/event/ngx_event_openssl.c
 +++ b/src/event/ngx_event_openssl.c
-@@ -862,7 +862,7 @@
+@@ -862,7 +862,71 @@
  
++static ngx_int_t
++ssl_tree_noop(ngx_tree_ctx_t *ctx, ngx_str_t *path)
++{
++    return NGX_OK;
++}
++
++
++/* For files *and symlinks*, attempt to load the specified
++ * certificate */
++static ngx_int_t
++ssl_file_handler(ngx_tree_ctx_t *ctx, ngx_str_t *path)
++{
++    int ret = 0;
++    struct stat sb;
++    STACK_OF(X509_NAME) *list = ctx->data;
++
++    /* Check that the object is a file (or a link to a file) by
++     * calling stat(), which follows symlinks. */
++    ret = stat((char *)path->data, &sb);
++    if (ret != 0) {
++        /* It doesn't exist; return early **without
++         * error**. We might have some dangling symlinks,
++         * and don't want to break here. */
++        return NGX_OK;
++    }
++
++    /* Safely ignore any non-file directory entries. */
++    if (! S_ISREG(sb.st_mode))
++        return NGX_OK;
++
++    /* Else, add the cert from the file */
++    ret = SSL_add_file_cert_subjects_to_stack(list, (char *) path->data);
++    if (ret == 0) {
++        ngx_ssl_error(NGX_LOG_EMERG, ctx->log, 0,
++                      "SSL_add_file_cert_subjects_to_stack(\"%s\") failed",
++                      path->data);
++        return NGX_ERROR;
++    }
++
++    /* else */
++    return NGX_OK;
++}
++
++static ngx_int_t add_dir_cert_subjects_to_stack(STACK_OF(X509_NAME) *stack,
++                                                ngx_str_t *path,
++                                                ngx_log_t *log)
++{
++    ngx_tree_ctx_t tree;
++
++    tree.init_handler = NULL;
++    tree.file_handler = ssl_file_handler;
++    tree.pre_tree_handler = ssl_tree_noop;
++    tree.post_tree_handler = ssl_tree_noop;
++    tree.spec_handler = ssl_file_handler;
++    tree.data = stack;
++    tree.alloc = 0;
++    tree.log = log;
++
++    if (ngx_walk_tree(&tree, path) != NGX_OK) {
++            return NGX_ERROR;
++    }
++}
++
++
  ngx_int_t
  ngx_ssl_client_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
 -    ngx_int_t depth)
@@ -235,10 +299,10 @@
 +        sk_X509_NAME_free(list);
 +        return NGX_ERROR;
 +    }
-+    if (ca_path->len && SSL_add_dir_cert_subjects_to_stack(list, (char *) ca_path->data) == 0) {
++    if (ca_path->len && add_dir_cert_subjects_to_stack(list, ca_path, ssl->log) == 0) {
          ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0,
 -                      "SSL_load_client_CA_file(\"%s\") failed", cert->data);
-+                      "SSL_add_dir_cert_subjects_to_stack(\"%s\") failed", ca_path->data);
++                      "add_dir_cert_subjects_to_stack(\"%s\") failed", ca_path->data);
 +        sk_X509_NAME_free(list);
          return NGX_ERROR;
      }

@@ -46,9 +46,9 @@ Depends: ${misc:Depends},
          nginx-common (>= ${source:Version}),
 Conflicts: nginx
 Breaks: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~),
-Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~),
+Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~), nginx
 Suggests: fcgiwrap, nginx-doc, ssl-cert
-Provides: httpd, httpd-cgi, ${nginx:abi}
+Provides: httpd, httpd-cgi, ${nginx:abi}, nginx
 Description: nginx web/proxy server (basic version)
  Nginx ("engine X") is a high-performance web and reverse proxy server
  created by Igor Sysoev. It can be used both as a standalone web server
