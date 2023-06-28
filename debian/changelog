@@ -1,3 +1,9 @@
+nginx (1.22.1-9pexip3) pexip; urgency=medium
+
+  * nginx-pexip/postinst: try to reload, but don't bail if it fails
+
+ -- Huw Jones <huw@pexip.com>  Wed, 28 Jun 2023 15:03:37 +0100
+
 nginx (1.22.1-9pexip2) pexip; urgency=medium
 
   * Add Provides: nginx and Replaces: nginx to nginx-pexip

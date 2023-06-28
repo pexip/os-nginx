@@ -19,10 +19,10 @@ esac
 
 if invoke-rc.d --quiet nginx status >/dev/null; then
   invoke-rc.d nginx upgrade || invoke-rc.d nginx restart
-  exit $?
+  exit 0
 else
   if [ -z "$(ss -nlt 'sport = 80' | grep -v ^State)" ]; then
-    invoke-rc.d nginx start || exit $?
+    invoke-rc.d nginx start || exit 0
   else
     echo "Not attempting to start NGINX, port 80 is already in use."
     exit 0
