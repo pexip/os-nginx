@@ -159,9 +159,10 @@ build.src:
 	echo "NGX_CONF_FLAGS=(" $(basic_configure_flags) ")" > $(BUILDDIR_src)/conf_flags
 	pod2man debian/debhelper/dh_nginx > $(BUILDDIR_src)/dh_nginx.1
 
-strip.arch.%:
-	#dh_strip --package=nginx-$(*) -O--dbgsym-migration='nginx-$(*)-dbg (<< 1.10.1-3~)'
+strip.arch.bin:
 	dh_strip --package=nginx -O--dbgsym-migration='nginx-dbg (<< 1.10.1-3~)'
+
+strip.arch.pexip:
 	dh_strip --package=nginx-pexip -O--dbgsym-migration='nginx-pexip-dbg (<< 1.10.1-3~)'
 
 strip.mods.%:
