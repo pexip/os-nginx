@@ -2,7 +2,7 @@ Source: nginx
 Section: httpd
 Priority: optional
 Maintainer: Debian Nginx Maintainers <pkg-nginx-maintainers@alioth-lists.debian.net>
-Uploaders: Jan Mojžíš <jan.mojzis@gmail.com>
+Uploaders: Jan Mojžíš <janmojzis@debian.org>
 Build-Depends: debhelper-compat (= 13),
                libexpat-dev,
                libgd-dev,
@@ -13,7 +13,7 @@ Build-Depends: debhelper-compat (= 13),
                libxslt1-dev,
                po-debconf,
                zlib1g-dev
-Standards-Version: 4.6.2
+Standards-Version: 4.7.0
 Homepage: https://nginx.org
 Vcs-Git: https://salsa.debian.org/nginx-team/nginx.git
 Vcs-Browser: https://salsa.debian.org/nginx-team/nginx
@@ -24,8 +24,7 @@ Architecture: any
 Depends: ${misc:Depends},
          ${shlibs:Depends},
          iproute2,
-         nginx-common (<< ${source:Version}.1~),
-         nginx-common (>= ${source:Version}),
+         nginx-common (= ${source:Version}),
 Breaks: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~),
 Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~),
 Provides: httpd, httpd-cgi, ${nginx:abi}
@@ -65,6 +64,7 @@ Package: nginx-dev
 Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends}, ${S:Build-Depends},
+         ${nginx:abi},
          nginx (<< ${source:Version}.1~),
          nginx (>= ${source:Version}),
 Provides: dh-sequence-nginx
@@ -121,13 +121,13 @@ Description: nginx web/proxy server (standard version)
 
 Package: nginx-full
 Architecture: all
-Depends: libnginx-mod-http-auth-pam (>= ${libnginx-mod-http-auth-pam:Version}~),
-         libnginx-mod-http-dav-ext (>= ${libnginx-mod-http-dav-ext:Version}~),
-         libnginx-mod-http-echo (>= ${libnginx-mod-http-echo:Version}~),
-         libnginx-mod-http-geoip2 (>= ${libnginx-mod-geoip2:Version}~),
-         libnginx-mod-http-subs-filter (>= ${libnginx-mod-http-subs-filter:Version}~),
-         libnginx-mod-http-upstream-fair (>= ${libnginx-mod-http-upstream-fair:Version}~),
-         libnginx-mod-stream-geoip2 (>= ${libnginx-mod-geoip2:Version}~),
+Depends: libnginx-mod-http-auth-pam,
+         libnginx-mod-http-dav-ext,
+         libnginx-mod-http-echo,
+         libnginx-mod-http-geoip2,
+         libnginx-mod-http-subs-filter,
+         libnginx-mod-http-upstream-fair,
+         libnginx-mod-stream-geoip2,
          nginx (>= ${source:Version}),
          nginx (<< ${source:Version}.1~),
          ${misc:Depends},
@@ -159,7 +159,7 @@ Description: nginx web/proxy server (standard version with 3rd parties)
 
 Package: nginx-light
 Architecture: all
-Depends: libnginx-mod-http-echo (>= ${libnginx-mod-http-echo:Version}~),
+Depends: libnginx-mod-http-echo,
          nginx (>= ${source:Version}),
          nginx (<< ${source:Version}.1~),
          ${misc:Depends},
@@ -191,19 +191,19 @@ Depends: nginx (= ${binary:Version}),
          libnginx-mod-mail (= ${binary:Version}),
          libnginx-mod-stream (= ${binary:Version}),
          libnginx-mod-stream-geoip (= ${binary:Version}),
-         libnginx-mod-http-auth-pam (>= ${libnginx-mod-http-auth-pam:Version}~),
-         libnginx-mod-http-cache-purge (>= ${libnginx-mod-http-cache-purge:Version}~),
-         libnginx-mod-http-dav-ext (>= ${libnginx-mod-http-dav-ext:Version}~),
-         libnginx-mod-http-echo (>= ${libnginx-mod-http-echo:Version}~),
-         libnginx-mod-http-fancyindex (>= ${libnginx-mod-http-fancyindex:Version}~),
-         libnginx-mod-http-geoip2 (>= ${libnginx-mod-geoip2:Version}~),
-         libnginx-mod-http-headers-more-filter (>= ${libnginx-mod-http-headers-more-filter:Version}~),
-         libnginx-mod-http-lua (>=${libnginx-mod-http-lua:Version}~) [amd64 arm64 armel armhf i386 mips64el mipsel s390x powerpc],
-         libnginx-mod-http-subs-filter (>= ${libnginx-mod-http-subs-filter:Version}~),
-         libnginx-mod-http-uploadprogress (>= ${libnginx-mod-http-uploadprogress:Version}~),
-         libnginx-mod-http-upstream-fair (>= ${libnginx-mod-http-upstream-fair:Version}~),
-         libnginx-mod-nchan (>= ${libnginx-mod-nchan:Version}~),
-         libnginx-mod-stream-geoip2 (>= ${libnginx-mod-geoip2:Version}~),
+         libnginx-mod-http-auth-pam,
+         libnginx-mod-http-cache-purge,
+         libnginx-mod-http-dav-ext,
+         libnginx-mod-http-echo,
+         libnginx-mod-http-fancyindex,
+         libnginx-mod-http-geoip2,
+         libnginx-mod-http-headers-more-filter,
+         libnginx-mod-http-lua [amd64 arm64 armel armhf i386 mips64el mipsel s390x powerpc],
+         libnginx-mod-http-subs-filter,
+         libnginx-mod-http-uploadprogress,
+         libnginx-mod-http-upstream-fair,
+         libnginx-mod-nchan,
+         libnginx-mod-stream-geoip2,
          ${misc:Depends},
          ${shlibs:Depends}
 Description: nginx web/proxy server (extended version)

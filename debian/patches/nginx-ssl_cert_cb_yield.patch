@@ -16,7 +16,7 @@ connections.
 
 --- a/src/event/ngx_event_openssl.c
 +++ b/src/event/ngx_event_openssl.c
-@@ -1832,6 +1832,23 @@
+@@ -1914,6 +1914,23 @@
          return NGX_AGAIN;
      }
  
@@ -40,7 +40,7 @@ connections.
      err = (sslerr == SSL_ERROR_SYSCALL) ? ngx_errno : 0;
  
      c->ssl->no_wait_shutdown = 1;
-@@ -1968,6 +1985,21 @@
+@@ -2050,6 +2067,21 @@
          c->read->handler = ngx_ssl_handshake_handler;
          c->write->handler = ngx_ssl_handshake_handler;
  

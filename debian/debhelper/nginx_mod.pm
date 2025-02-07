@@ -35,11 +35,17 @@ sub _NDK_SRC_DIR {
 sub new {
 	my $class=shift;
 	my $this= $class->SUPER::new(@_);
+	my $ngx_ver = `grep 'define NGINX_VERSION' /usr/share/nginx/src/src/core/nginx.h | sed -e 's/^.*"\\(.*\\)".*/\\1/'`;
+	chomp($ngx_ver);
 	$this->prefer_out_of_source_building(@_);
 	$this->{has_ndk} = $this->has_build_dep("libnginx-mod-http-ndk-dev");
+	$this->{has_stream} = $this->has_build_dep("libnginx-mod-stream");
 	foreach my $cur (getpackages('arch')) {
 		if ($this->{has_ndk} == 1) {
 			addsubstvar($cur, "misc:Depends", "libnginx-mod-http-ndk");
+		}
+		if ($this->{has_stream} == 1) {
+			addsubstvar($cur, "misc:Depends", "libnginx-mod-stream (>= $ngx_ver), libnginx-mod-stream (<< $ngx_ver.1~)");
 		}
 	}
 	return $this;
@@ -63,6 +69,7 @@ sub configure {
 		--add-dynamic-module="$pwd_dir/$src_dir" \\
 		--builddir="$pwd_dir/$bld_dir" \\
 		' . ($this->{has_ndk} ? '--add-module=' . $this->_NDK_SRC_DIR : '') . ' \\
+		' . ($this->{has_stream} ? '--with-stream' : '') . ' \\
 		"$@"', "dummy", @_);
 }
 
@@ -77,6 +84,10 @@ sub test {
 
 	if ( $this->{has_ndk} and !grep( /^ndk_http_module.so$/, @_ ) ) {
 		unshift @_, "ndk_http_module.so";
+	}
+
+	if ( $this->{has_stream} and !grep( /^ngx_stream_module.so$/, @_ ) ) {
+		unshift @_, "ngx_stream_module.so";
 	}
 
 	$this->doit_in_builddir("bash", "-e", "-o", "pipefail", "-c", '

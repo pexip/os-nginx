@@ -1,8 +1,110 @@
-nginx (1.22.1-9+deb12u1) bookworm; urgency=medium
+nginx (1.26.3-2) unstable; urgency=medium
 
-  * d/p/CVE-2025-23419.patch add, backport CVE-2025-23419 fix.
+  * Team upload
+  * Upload to unstable 
 
- -- Jan Mojžíš <janmojzis@debian.org>  Mon, 17 Feb 2025 20:40:29 +0100
+ -- Jérémy Lal <kapouer@melix.org>  Fri, 07 Feb 2025 12:53:11 +0100
+
+nginx (1.26.3-1) experimental; urgency=medium
+
+  * Team upload
+  * New upstream version 1.26.3
+
+ -- Jérémy Lal <kapouer@melix.org>  Wed, 05 Feb 2025 19:08:02 +0100
+
+nginx (1.26.2-1) experimental; urgency=medium
+
+  * Team upload
+  * New upstream version 1.26.2
+  * Add Sergey Kandaurov <s.kandaurov@f5.com> pgp public key
+  * Drop upstream patches
+
+  [ Jan Mojžíš ]
+  * d/gbp.conf: add upstream-signatures = on
+  * d/{control,copyright}: update my email to "janmojzis@debian.org"
+  * d/copyright: bump my copyright year
+
+ -- Jérémy Lal <kapouer@melix.org>  Sun, 02 Feb 2025 21:08:45 +0100
+
+nginx (1.26.0-3) unstable; urgency=medium
+
+  * d/control: Resolve dependency loop between nginx and nginx-common.
+    (Fixes: #1082373)
+
+ -- Thomas Ward <teward@ubuntu.com>  Fri, 20 Sep 2024 21:35:42 -0400
+
+nginx (1.26.0-2) unstable; urgency=medium
+
+  [ Jan Mojžíš ]
+  * d/rules: enable QUIC and HTTP/3 module (Closes: 1070488)
+  * d/control: bump Standards-Version: 4.7.0, no changes
+  * d/p/nginx-1.26.1.patch add, backport changes from the nginx 1.26.1 and fix
+    CVE-2024-32760, CVE-2024-31079, CVE-2024-35200, CVE-2024-34161
+  * d/p/CVE-2024-7347.patch add, backport CVE-2024-7347 fix (Closes: 1078971)
+  * d/libnginx-mod.abisubstvars updated comment when ABI needs to be changed
+
+  [ Thomas Ward ]
+  * d/conf/nginx.conf: Update default options for current security
+    practices and standards. SSL protos, disable prefer server
+    ciphers, hide server tokens/versions in responses.
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Mon, 19 Aug 2024 18:46:30 +0200
+
+nginx (1.26.0-1) unstable; urgency=medium
+
+  * New upstream version 1.26.0
+  * nginx ABI release: nginx-abi-1.26.0-1 (Closes: 1069997)
+  * d/libnginx-mod.abisubstvars: remove third-party modules version constraints
+  * d/u/signing-key.asc add Roman Arutyunyan’s PGP public key,
+    the key is used to sign the 1.26.0 release
+  * d/p/CVE-2023-44487.patch remove, fixed in upstream
+  * d/ufw/nginx update, add QUICK, thanks Marcus Bointon
+  * d/conf/mime.types add application/xslt+xml, thanks K. Widholm
+  * d/copyright: updated copyright related to new upstream version
+  * d/copyright: bump my copyright year
+  * d/conf/nginx.conf: add worker_cpu_affinity auto (Closes: 1063659)
+  * d/gbp.conf: add sign-tags = True, [pull] track-missing = True,
+    [import-orig] merge-mode = replace
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Sun, 05 May 2024 18:48:05 +0200
+
+nginx (1.24.0-2) unstable; urgency=medium
+
+  * d/control added dependency nginx-common to nginx (Closes: 1039905)
+    After nginx installation, the nginx-common package is installed
+    automatically due to its dependencies. The nginx-common package includes
+    the systemd unit, which becomes enabled and activated upon installation.
+    When the nginx is removed, nginx-common package and the systemd unit will
+    remain in the system. Adding a dependency nginx-common to nginx solves
+    this problem.
+  * d/control fixed binNMU safe dependency declaration nginx to nginx-common,
+    nginx is 'any', nginx-common is 'all' -> dependency '= ${source:Version}'
+  * d/rules removed override_dh_strip, migration to automatic debug symbols is
+    already done, fixes debug-symbol-migration-possibly-complete lint. warning
+  * d/po/ro.po added Romanian debconf translation. (Closes: 1033084),
+    Thanks to Remus-Gabriel Chelu
+  * d/po/sv.po added Swedish debconf translation. (Closes: 1050443),
+    Thanks to Peter Kvillegård
+  * d/conf/mime.types added video/ogg, video/x-matroska (Closes: 1028144)
+  * d/p/CVE-2023-44487.patch adds additional mitigations for CVE-2023-44487
+    that according to NGINX developers on nginx-devel are already suitably
+    mitigated with the default config options for keepalive. (Closes: 1053770)
+  * d/control added nginx-dev dependency on ${nginx:abi}
+  * d/debhelper/nginx_mod.pm automatic libnginx-mod-stream dependencies
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Wed, 11 Oct 2023 01:17:51 +0200
+
+nginx (1.24.0-1) unstable; urgency=medium
+
+  * New upstream version 1.24.0
+  * nginx ABI release: nginx-abi-1.24.0-1
+  * d/libnginx-mod.abisubstvars update version constraints of the 3rd party
+    modules
+  * d/p/bug-{1024605,973861}.patch removed, fixed in upstream
+  * d/copyright: updated copyright for files src/event/ngx_event_udp.h,
+    src/os/win32/ngx_dlopen
+
+ -- Jan Mojžíš <jan.mojzis@gmail.com>  Tue, 27 Jun 2023 23:19:31 +0200
 
 nginx (1.22.1-9) unstable; urgency=medium
 
