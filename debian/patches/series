@@ -4,3 +4,5 @@ nginx-ssl_cert_cb_yield.patch
 bug-1024605.patch
 bug-973861.patch
 CVE-2025-23419.patch
+CVE-2024-7347-1.patch
+CVE-2024-7347-2.patch
