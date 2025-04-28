@@ -7,7 +7,7 @@ Last-Update: 2020-06-24
 This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 --- a/src/core/nginx.c
 +++ b/src/core/nginx.c
-@@ -339,14 +339,21 @@
+@@ -340,14 +340,21 @@
          ngx_process = NGX_PROCESS_MASTER;
      }
  
@@ -30,7 +30,7 @@ This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
              return 1;
          }
  
-@@ -359,8 +366,19 @@
+@@ -360,8 +367,19 @@
  
  #endif
  
