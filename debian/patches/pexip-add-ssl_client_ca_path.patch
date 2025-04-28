@@ -1,6 +1,6 @@
---- a/src/http/modules/ngx_http_ssl_module.c
-+++ b/src/http/modules/ngx_http_ssl_module.c
-@@ -165,6 +165,13 @@
+--- nginx.orig/src/http/modules/ngx_http_ssl_module.c
++++ nginx/src/http/modules/ngx_http_ssl_module.c
+@@ -171,6 +171,13 @@ static ngx_command_t  ngx_http_ssl_comma
        offsetof(ngx_http_ssl_srv_conf_t, client_certificate),
        NULL },
  
@@ -14,7 +14,7 @@
      { ngx_string("ssl_trusted_certificate"),
        NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_TAKE1,
        ngx_conf_set_str_slot,
-@@ -564,6 +571,7 @@
+@@ -609,6 +616,7 @@ ngx_http_ssl_create_srv_conf(ngx_conf_t
       *     sscf->dhparam = { 0, NULL };
       *     sscf->ecdh_curve = { 0, NULL };
       *     sscf->client_certificate = { 0, NULL };
@@ -22,7 +22,7 @@
       *     sscf->trusted_certificate = { 0, NULL };
       *     sscf->trusted_ca_path = { 0, NULL };
       *     sscf->crl = { 0, NULL };
-@@ -640,6 +648,8 @@
+@@ -680,6 +688,8 @@ ngx_http_ssl_merge_srv_conf(ngx_conf_t *
  
      ngx_conf_merge_str_value(conf->client_certificate, prev->client_certificate,
                           "");
@@ -31,7 +31,7 @@
      ngx_conf_merge_str_value(conf->trusted_certificate,
                           prev->trusted_certificate, "");
      ngx_conf_merge_str_value(conf->trusted_ca_path, prev->trusted_ca_path, "");
-@@ -784,14 +794,15 @@
+@@ -796,14 +806,15 @@ ngx_http_ssl_merge_srv_conf(ngx_conf_t *
  
      if (conf->verify) {
  
@@ -49,9 +49,9 @@
                                         conf->verify_depth)
              != NGX_OK)
          {
---- a/src/http/modules/ngx_http_ssl_module.h
-+++ b/src/http/modules/ngx_http_ssl_module.h
-@@ -42,6 +42,7 @@
+--- nginx.orig/src/http/modules/ngx_http_ssl_module.h
++++ nginx/src/http/modules/ngx_http_ssl_module.h
+@@ -41,6 +41,7 @@ typedef struct {
      ngx_str_t                       dhparam;
      ngx_str_t                       ecdh_curve;
      ngx_str_t                       client_certificate;
@@ -59,9 +59,9 @@
      ngx_str_t                       trusted_certificate;
      ngx_str_t                       trusted_ca_path;
      ngx_str_t                       crl;
---- a/src/mail/ngx_mail_ssl_module.c
-+++ b/src/mail/ngx_mail_ssl_module.c
-@@ -182,6 +182,13 @@
+--- nginx.orig/src/mail/ngx_mail_ssl_module.c
++++ nginx/src/mail/ngx_mail_ssl_module.c
+@@ -181,6 +181,13 @@ static ngx_command_t  ngx_mail_ssl_comma
        offsetof(ngx_mail_ssl_conf_t, client_certificate),
        NULL },
  
@@ -75,7 +75,7 @@
      { ngx_string("ssl_trusted_certificate"),
        NGX_MAIL_MAIN_CONF|NGX_MAIL_SRV_CONF|NGX_CONF_TAKE1,
        ngx_conf_set_str_slot,
-@@ -256,6 +263,7 @@
+@@ -310,6 +317,7 @@ ngx_mail_ssl_create_conf(ngx_conf_t *cf)
       *     scf->dhparam = { 0, NULL };
       *     scf->ecdh_curve = { 0, NULL };
       *     scf->client_certificate = { 0, NULL };
@@ -83,7 +83,7 @@
       *     scf->trusted_certificate = { 0, NULL };
       *     scf->trusted_ca_path = { 0, NULL };
       *     scf->crl = { 0, NULL };
-@@ -319,6 +327,7 @@
+@@ -373,6 +381,7 @@ ngx_mail_ssl_merge_conf(ngx_conf_t *cf,
  
      ngx_conf_merge_str_value(conf->client_certificate,
                           prev->client_certificate, "");
@@ -91,7 +91,7 @@
      ngx_conf_merge_str_value(conf->trusted_certificate,
                           prev->trusted_certificate, "");
      ngx_conf_merge_str_value(conf->trusted_ca_path, prev->trusted_ca_path, "");
-@@ -396,14 +405,15 @@
+@@ -460,14 +469,15 @@ ngx_mail_ssl_merge_conf(ngx_conf_t *cf,
  
      if (conf->verify) {
  
@@ -109,9 +109,9 @@
                                         conf->verify_depth)
              != NGX_OK)
          {
---- a/src/mail/ngx_mail_ssl_module.h
-+++ b/src/mail/ngx_mail_ssl_module.h
-@@ -42,6 +42,7 @@
+--- nginx.orig/src/mail/ngx_mail_ssl_module.h
++++ nginx/src/mail/ngx_mail_ssl_module.h
+@@ -41,6 +41,7 @@ typedef struct {
      ngx_str_t        dhparam;
      ngx_str_t        ecdh_curve;
      ngx_str_t        client_certificate;
@@ -119,10 +119,10 @@
      ngx_str_t        trusted_certificate;
      ngx_str_t        trusted_ca_path;
      ngx_str_t        crl;
---- a/src/stream/ngx_stream_ssl_module.c
-+++ b/src/stream/ngx_stream_ssl_module.c
-@@ -147,6 +147,13 @@
-       offsetof(ngx_stream_ssl_conf_t, client_certificate),
+--- nginx.orig/src/stream/ngx_stream_ssl_module.c
++++ nginx/src/stream/ngx_stream_ssl_module.c
+@@ -163,6 +163,13 @@ static ngx_command_t  ngx_stream_ssl_com
+       offsetof(ngx_stream_ssl_srv_conf_t, client_certificate),
        NULL },
  
 +    { ngx_string("ssl_client_ca_path"),
@@ -135,15 +135,7 @@
      { ngx_string("ssl_trusted_certificate"),
        NGX_STREAM_MAIN_CONF|NGX_STREAM_SRV_CONF|NGX_CONF_TAKE1,
        ngx_conf_set_str_slot,
-@@ -592,6 +599,7 @@
-      *     scf->dhparam = { 0, NULL };
-      *     scf->ecdh_curve = { 0, NULL };
-      *     scf->client_certificate = { 0, NULL };
-+     *     scf->client_ca_path = { 0, NULL };
-      *     scf->trusted_certificate = { 0, NULL };
-      *     scf->trusted_ca_path = { 0, NULL };
-      *     scf->crl = { 0, NULL };
-@@ -649,6 +657,7 @@
+@@ -864,6 +871,7 @@ ngx_stream_ssl_merge_srv_conf(ngx_conf_t
  
      ngx_conf_merge_str_value(conf->client_certificate, prev->client_certificate,
                           "");
@@ -151,7 +143,7 @@
      ngx_conf_merge_str_value(conf->trusted_certificate,
                           prev->trusted_certificate, "");
      ngx_conf_merge_str_value(conf->trusted_ca_path, prev->trusted_ca_path, "");
-@@ -752,14 +761,15 @@
+@@ -963,14 +971,15 @@ ngx_stream_ssl_merge_srv_conf(ngx_conf_t
  
      if (conf->verify) {
  
@@ -169,9 +161,9 @@
                                         conf->verify_depth)
              != NGX_OK)
          {
---- a/src/stream/ngx_stream_ssl_module.h
-+++ b/src/stream/ngx_stream_ssl_module.h
-@@ -40,6 +40,7 @@
+--- nginx.orig/src/stream/ngx_stream_ssl_module.h
++++ nginx/src/stream/ngx_stream_ssl_module.h
+@@ -40,6 +40,7 @@ typedef struct {
      ngx_str_t        dhparam;
      ngx_str_t        ecdh_curve;
      ngx_str_t        client_certificate;
@@ -179,9 +171,11 @@
      ngx_str_t        trusted_certificate;
      ngx_str_t        trusted_ca_path;
      ngx_str_t        crl;
---- a/src/event/ngx_event_openssl.c
-+++ b/src/event/ngx_event_openssl.c
-@@ -862,7 +862,71 @@
+--- nginx.orig/src/event/ngx_event_openssl.c
++++ nginx/src/event/ngx_event_openssl.c
+@@ -899,9 +899,73 @@ ngx_ssl_ciphers(ngx_conf_t *cf, ngx_ssl_
+ }
+ 
  
 +static ngx_int_t
 +ssl_tree_noop(ngx_tree_ctx_t *ctx, ngx_str_t *path)
@@ -254,7 +248,7 @@
  {
      STACK_OF(X509_NAME)  *list;
  
-@@ -870,20 +870,21 @@
+@@ -909,20 +973,21 @@ ngx_ssl_client_certificate(ngx_conf_t *c
  
      SSL_CTX_set_verify_depth(ssl->ctx, depth);
  
@@ -281,7 +275,7 @@
          return NGX_ERROR;
      }
  
-@@ -894,11 +895,22 @@
+@@ -933,11 +998,22 @@ ngx_ssl_client_certificate(ngx_conf_t *c
  
      ERR_clear_error();
  
@@ -307,9 +301,9 @@
          return NGX_ERROR;
      }
  
---- a/src/event/ngx_event_openssl.h
-+++ b/src/event/ngx_event_openssl.h
-@@ -172,7 +172,7 @@
+--- nginx.orig/src/event/ngx_event_openssl.h
++++ nginx/src/event/ngx_event_openssl.h
+@@ -201,7 +201,7 @@ ngx_int_t ngx_ssl_connection_certificate
  ngx_int_t ngx_ssl_ciphers(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *ciphers,
      ngx_uint_t prefer_server_ciphers);
  ngx_int_t ngx_ssl_client_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl,

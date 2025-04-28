@@ -17,9 +17,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
  src/stream/ngx_stream_ssl_module.c              |  8 ++++++++
  src/stream/ngx_stream_ssl_module.h              |  1 +
 
---- a/src/event/ngx_event_openssl.c
-+++ b/src/event/ngx_event_openssl.c
-@@ -914,37 +914,38 @@
+--- nginx.orig/src/event/ngx_event_openssl.c
++++ nginx/src/event/ngx_event_openssl.c
+@@ -949,27 +949,28 @@ ngx_ssl_client_certificate(ngx_conf_t *c
  
  ngx_int_t
  ngx_ssl_trusted_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *cert,
@@ -54,19 +54,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
          return NGX_ERROR;
      }
  
-     /*
-      * SSL_CTX_load_verify_locations() may leave errors in the error queue
-      * while returning success
-      */
- 
-     ERR_clear_error();
- 
-     return NGX_OK;
- }
- 
---- a/src/event/ngx_event_openssl.h
-+++ b/src/event/ngx_event_openssl.h
-@@ -174,7 +174,7 @@
+--- nginx.orig/src/event/ngx_event_openssl.h
++++ nginx/src/event/ngx_event_openssl.h
+@@ -203,7 +203,7 @@ ngx_int_t ngx_ssl_ciphers(ngx_conf_t *cf
  ngx_int_t ngx_ssl_client_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl,
      ngx_str_t *cert, ngx_int_t depth);
  ngx_int_t ngx_ssl_trusted_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl,
@@ -75,9 +65,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
  ngx_int_t ngx_ssl_crl(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *crl);
  ngx_int_t ngx_ssl_stapling(ngx_conf_t *cf, ngx_ssl_t *ssl,
      ngx_str_t *file, ngx_str_t *responder, ngx_uint_t verify);
---- a/src/http/modules/ngx_http_grpc_module.c
-+++ b/src/http/modules/ngx_http_grpc_module.c
-@@ -36,6 +36,7 @@
+--- nginx.orig/src/http/modules/ngx_http_grpc_module.c
++++ nginx/src/http/modules/ngx_http_grpc_module.c
+@@ -36,6 +36,7 @@ typedef struct {
      ngx_str_t                  ssl_ciphers;
      ngx_uint_t                 ssl_verify_depth;
      ngx_str_t                  ssl_trusted_certificate;
@@ -85,7 +75,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_str_t                  ssl_crl;
      ngx_array_t               *ssl_conf_commands;
  #endif
-@@ -407,6 +408,13 @@
+@@ -416,6 +417,13 @@ static ngx_command_t  ngx_http_grpc_comm
        offsetof(ngx_http_grpc_loc_conf_t, ssl_trusted_certificate),
        NULL },
  
@@ -99,7 +89,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      { ngx_string("grpc_ssl_crl"),
        NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
        ngx_conf_set_str_slot,
-@@ -4282,6 +4290,7 @@
+@@ -4360,6 +4368,7 @@ ngx_http_grpc_create_loc_conf(ngx_conf_t
       *     conf->ssl_protocols = 0;
       *     conf->ssl_ciphers = { 0, NULL };
       *     conf->ssl_trusted_certificate = { 0, NULL };
@@ -107,7 +97,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
       *     conf->ssl_crl = { 0, NULL };
       */
  
-@@ -4408,6 +4417,8 @@
+@@ -4493,6 +4502,8 @@ ngx_http_grpc_merge_loc_conf(ngx_conf_t
                                prev->ssl_verify_depth, 1);
      ngx_conf_merge_str_value(conf->ssl_trusted_certificate,
                                prev->ssl_trusted_certificate, "");
@@ -116,7 +106,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_conf_merge_str_value(conf->ssl_crl, prev->ssl_crl, "");
  
      ngx_conf_merge_ptr_value(conf->upstream.ssl_certificate,
-@@ -4833,14 +4844,15 @@
+@@ -4995,14 +5006,15 @@ ngx_http_grpc_set_ssl(ngx_conf_t *cf, ng
      }
  
      if (glcf->upstream.ssl_verify) {
@@ -134,9 +124,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
                                          glcf->ssl_verify_depth)
              != NGX_OK)
          {
---- a/src/http/modules/ngx_http_proxy_module.c
-+++ b/src/http/modules/ngx_http_proxy_module.c
-@@ -96,6 +96,7 @@
+--- nginx.orig/src/http/modules/ngx_http_proxy_module.c
++++ nginx/src/http/modules/ngx_http_proxy_module.c
+@@ -123,6 +123,7 @@ typedef struct {
      ngx_str_t                      ssl_ciphers;
      ngx_uint_t                     ssl_verify_depth;
      ngx_str_t                      ssl_trusted_certificate;
@@ -144,7 +134,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_str_t                      ssl_crl;
      ngx_array_t                   *ssl_conf_commands;
  #endif
-@@ -694,6 +695,13 @@
+@@ -743,6 +744,13 @@ static ngx_command_t  ngx_http_proxy_com
        offsetof(ngx_http_proxy_loc_conf_t, ssl_trusted_certificate),
        NULL },
  
@@ -158,7 +148,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      { ngx_string("proxy_ssl_crl"),
        NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
        ngx_conf_set_str_slot,
-@@ -2826,6 +2834,7 @@
+@@ -3350,6 +3358,7 @@ ngx_http_proxy_create_loc_conf(ngx_conf_
       *     conf->ssl_protocols = 0;
       *     conf->ssl_ciphers = { 0, NULL };
       *     conf->ssl_trusted_certificate = { 0, NULL };
@@ -166,7 +156,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
       *     conf->ssl_crl = { 0, NULL };
       */
  
-@@ -3220,6 +3229,8 @@
+@@ -3751,6 +3760,8 @@ ngx_http_proxy_merge_loc_conf(ngx_conf_t
                                prev->ssl_verify_depth, 1);
      ngx_conf_merge_str_value(conf->ssl_trusted_certificate,
                                prev->ssl_trusted_certificate, "");
@@ -175,7 +165,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_conf_merge_str_value(conf->ssl_crl, prev->ssl_crl, "");
  
      ngx_conf_merge_ptr_value(conf->upstream.ssl_certificate,
-@@ -4301,14 +4312,15 @@
+@@ -5041,14 +5052,15 @@ ngx_http_proxy_set_ssl(ngx_conf_t *cf, n
      }
  
      if (plcf->upstream.ssl_verify) {
@@ -193,9 +183,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
                                          plcf->ssl_verify_depth)
              != NGX_OK)
          {
---- a/src/http/modules/ngx_http_ssl_module.c
-+++ b/src/http/modules/ngx_http_ssl_module.c
-@@ -172,6 +172,13 @@
+--- nginx.orig/src/http/modules/ngx_http_ssl_module.c
++++ nginx/src/http/modules/ngx_http_ssl_module.c
+@@ -178,6 +178,13 @@ static ngx_command_t  ngx_http_ssl_comma
        offsetof(ngx_http_ssl_srv_conf_t, trusted_certificate),
        NULL },
  
@@ -209,7 +199,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      { ngx_string("ssl_prefer_server_ciphers"),
        NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_FLAG,
        ngx_conf_set_flag_slot,
-@@ -558,6 +565,7 @@
+@@ -603,6 +610,7 @@ ngx_http_ssl_create_srv_conf(ngx_conf_t
       *     sscf->ecdh_curve = { 0, NULL };
       *     sscf->client_certificate = { 0, NULL };
       *     sscf->trusted_certificate = { 0, NULL };
@@ -217,7 +207,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
       *     sscf->crl = { 0, NULL };
       *     sscf->ciphers = { 0, NULL };
       *     sscf->shm_zone = NULL;
-@@ -634,6 +642,7 @@
+@@ -674,6 +682,7 @@ ngx_http_ssl_merge_srv_conf(ngx_conf_t *
                           "");
      ngx_conf_merge_str_value(conf->trusted_certificate,
                           prev->trusted_certificate, "");
@@ -225,7 +215,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_conf_merge_str_value(conf->crl, prev->crl, "");
  
      ngx_conf_merge_str_value(conf->ecdh_curve, prev->ecdh_curve,
-@@ -792,6 +801,7 @@
+@@ -804,6 +813,7 @@ ngx_http_ssl_merge_srv_conf(ngx_conf_t *
  
      if (ngx_ssl_trusted_certificate(cf, &conf->ssl,
                                      &conf->trusted_certificate,
@@ -233,9 +223,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
                                      conf->verify_depth)
          != NGX_OK)
      {
---- a/src/http/modules/ngx_http_ssl_module.h
-+++ b/src/http/modules/ngx_http_ssl_module.h
-@@ -43,6 +43,7 @@
+--- nginx.orig/src/http/modules/ngx_http_ssl_module.h
++++ nginx/src/http/modules/ngx_http_ssl_module.h
+@@ -42,6 +42,7 @@ typedef struct {
      ngx_str_t                       ecdh_curve;
      ngx_str_t                       client_certificate;
      ngx_str_t                       trusted_certificate;
@@ -243,9 +233,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_str_t                       crl;
  
      ngx_str_t                       ciphers;
---- a/src/http/modules/ngx_http_uwsgi_module.c
-+++ b/src/http/modules/ngx_http_uwsgi_module.c
-@@ -53,6 +53,7 @@
+--- nginx.orig/src/http/modules/ngx_http_uwsgi_module.c
++++ nginx/src/http/modules/ngx_http_uwsgi_module.c
+@@ -53,6 +53,7 @@ typedef struct {
      ngx_str_t                  ssl_ciphers;
      ngx_uint_t                 ssl_verify_depth;
      ngx_str_t                  ssl_trusted_certificate;
@@ -253,7 +243,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_str_t                  ssl_crl;
      ngx_array_t               *ssl_conf_commands;
  #endif
-@@ -532,6 +533,13 @@
+@@ -538,6 +539,13 @@ static ngx_command_t ngx_http_uwsgi_comm
        offsetof(ngx_http_uwsgi_loc_conf_t, ssl_trusted_certificate),
        NULL },
  
@@ -267,7 +257,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      { ngx_string("uwsgi_ssl_crl"),
        NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
        ngx_conf_set_str_slot,
-@@ -1785,6 +1793,8 @@
+@@ -1895,6 +1903,8 @@ ngx_http_uwsgi_merge_loc_conf(ngx_conf_t
                                prev->ssl_verify_depth, 1);
      ngx_conf_merge_str_value(conf->ssl_trusted_certificate,
                                prev->ssl_trusted_certificate, "");
@@ -276,7 +266,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_conf_merge_str_value(conf->ssl_crl, prev->ssl_crl, "");
  
      ngx_conf_merge_ptr_value(conf->upstream.ssl_certificate,
-@@ -2390,14 +2400,15 @@
+@@ -2576,14 +2586,15 @@ ngx_http_uwsgi_set_ssl(ngx_conf_t *cf, n
      }
  
      if (uwcf->upstream.ssl_verify) {
@@ -294,9 +284,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
                                          uwcf->ssl_verify_depth)
              != NGX_OK)
          {
---- a/src/mail/ngx_mail_ssl_module.c
-+++ b/src/mail/ngx_mail_ssl_module.c
-@@ -189,6 +189,14 @@
+--- nginx.orig/src/mail/ngx_mail_ssl_module.c
++++ nginx/src/mail/ngx_mail_ssl_module.c
+@@ -188,6 +188,14 @@ static ngx_command_t  ngx_mail_ssl_comma
        offsetof(ngx_mail_ssl_conf_t, trusted_certificate),
        NULL },
  
@@ -311,7 +301,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      { ngx_string("ssl_crl"),
        NGX_MAIL_MAIN_CONF|NGX_MAIL_SRV_CONF|NGX_CONF_TAKE1,
        ngx_conf_set_str_slot,
-@@ -249,6 +257,7 @@
+@@ -303,6 +311,7 @@ ngx_mail_ssl_create_conf(ngx_conf_t *cf)
       *     scf->ecdh_curve = { 0, NULL };
       *     scf->client_certificate = { 0, NULL };
       *     scf->trusted_certificate = { 0, NULL };
@@ -319,7 +309,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
       *     scf->crl = { 0, NULL };
       *     scf->ciphers = { 0, NULL };
       *     scf->shm_zone = NULL;
-@@ -312,6 +321,7 @@
+@@ -366,6 +375,7 @@ ngx_mail_ssl_merge_conf(ngx_conf_t *cf,
                           prev->client_certificate, "");
      ngx_conf_merge_str_value(conf->trusted_certificate,
                           prev->trusted_certificate, "");
@@ -327,7 +317,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_conf_merge_str_value(conf->crl, prev->crl, "");
  
      ngx_conf_merge_str_value(conf->ciphers, prev->ciphers, NGX_DEFAULT_CIPHERS);
-@@ -402,6 +412,7 @@
+@@ -466,6 +476,7 @@ ngx_mail_ssl_merge_conf(ngx_conf_t *cf,
  
          if (ngx_ssl_trusted_certificate(cf, &conf->ssl,
                                          &conf->trusted_certificate,
@@ -335,9 +325,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
                                          conf->verify_depth)
              != NGX_OK)
          {
---- a/src/mail/ngx_mail_ssl_module.h
-+++ b/src/mail/ngx_mail_ssl_module.h
-@@ -43,6 +43,7 @@
+--- nginx.orig/src/mail/ngx_mail_ssl_module.h
++++ nginx/src/mail/ngx_mail_ssl_module.h
+@@ -42,6 +42,7 @@ typedef struct {
      ngx_str_t        ecdh_curve;
      ngx_str_t        client_certificate;
      ngx_str_t        trusted_certificate;
@@ -345,9 +335,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_str_t        crl;
  
      ngx_str_t        ciphers;
---- a/src/stream/ngx_stream_proxy_module.c
-+++ b/src/stream/ngx_stream_proxy_module.c
-@@ -45,6 +45,7 @@
+--- nginx.orig/src/stream/ngx_stream_proxy_module.c
++++ nginx/src/stream/ngx_stream_proxy_module.c
+@@ -46,6 +46,7 @@ typedef struct {
      ngx_flag_t                       ssl_verify;
      ngx_uint_t                       ssl_verify_depth;
      ngx_str_t                        ssl_trusted_certificate;
@@ -355,7 +345,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_str_t                        ssl_crl;
      ngx_stream_complex_value_t      *ssl_certificate;
      ngx_stream_complex_value_t      *ssl_certificate_key;
-@@ -303,6 +304,13 @@
+@@ -320,6 +321,13 @@ static ngx_command_t  ngx_stream_proxy_c
        offsetof(ngx_stream_proxy_srv_conf_t, ssl_trusted_certificate),
        NULL },
  
@@ -369,7 +359,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      { ngx_string("proxy_ssl_crl"),
        NGX_STREAM_MAIN_CONF|NGX_STREAM_SRV_CONF|NGX_CONF_TAKE1,
        ngx_conf_set_str_slot,
-@@ -1954,6 +1962,7 @@
+@@ -2070,6 +2078,7 @@ ngx_stream_proxy_create_srv_conf(ngx_con
       *     conf->ssl_protocols = 0;
       *     conf->ssl_ciphers = { 0, NULL };
       *     conf->ssl_trusted_certificate = { 0, NULL };
@@ -377,7 +367,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
       *     conf->ssl_crl = { 0, NULL };
       *
       *     conf->ssl = NULL;
-@@ -2061,6 +2070,9 @@
+@@ -2181,6 +2190,9 @@ ngx_stream_proxy_merge_srv_conf(ngx_conf
      ngx_conf_merge_str_value(conf->ssl_trusted_certificate,
                                prev->ssl_trusted_certificate, "");
  
@@ -387,7 +377,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_conf_merge_str_value(conf->ssl_crl, prev->ssl_crl, "");
  
      ngx_conf_merge_ptr_value(conf->ssl_certificate,
-@@ -2130,14 +2142,15 @@
+@@ -2314,14 +2326,15 @@ ngx_stream_proxy_set_ssl(ngx_conf_t *cf,
      }
  
      if (pscf->ssl_verify) {
@@ -405,10 +395,10 @@ Subject: [PATCH] add ssl_trusted_ca_path
                                          pscf->ssl_verify_depth)
              != NGX_OK)
          {
---- a/src/stream/ngx_stream_ssl_module.c
-+++ b/src/stream/ngx_stream_ssl_module.c
-@@ -154,6 +154,13 @@
-       offsetof(ngx_stream_ssl_conf_t, trusted_certificate),
+--- nginx.orig/src/stream/ngx_stream_ssl_module.c
++++ nginx/src/stream/ngx_stream_ssl_module.c
+@@ -170,6 +170,13 @@ static ngx_command_t  ngx_stream_ssl_com
+       offsetof(ngx_stream_ssl_srv_conf_t, trusted_certificate),
        NULL },
  
 +    { ngx_string("ssl_trusted_ca_path"),
@@ -421,15 +411,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      { ngx_string("ssl_prefer_server_ciphers"),
        NGX_STREAM_MAIN_CONF|NGX_STREAM_SRV_CONF|NGX_CONF_FLAG,
        ngx_conf_set_flag_slot,
-@@ -586,6 +593,7 @@
-      *     scf->ecdh_curve = { 0, NULL };
-      *     scf->client_certificate = { 0, NULL };
-      *     scf->trusted_certificate = { 0, NULL };
-+     *     scf->trusted_ca_path = { 0, NULL };
-      *     scf->crl = { 0, NULL };
-      *     scf->alpn = { 0, NULL };
-      *     scf->ciphers = { 0, NULL };
-@@ -643,6 +651,7 @@
+@@ -859,6 +866,7 @@ ngx_stream_ssl_merge_srv_conf(ngx_conf_t
                           "");
      ngx_conf_merge_str_value(conf->trusted_certificate,
                           prev->trusted_certificate, "");
@@ -437,7 +419,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
      ngx_conf_merge_str_value(conf->crl, prev->crl, "");
      ngx_conf_merge_str_value(conf->alpn, prev->alpn, "");
  
-@@ -759,6 +768,7 @@
+@@ -971,6 +979,7 @@ ngx_stream_ssl_merge_srv_conf(ngx_conf_t
  
          if (ngx_ssl_trusted_certificate(cf, &conf->ssl,
                                          &conf->trusted_certificate,
@@ -445,9 +427,9 @@ Subject: [PATCH] add ssl_trusted_ca_path
                                          conf->verify_depth)
              != NGX_OK)
          {
---- a/src/stream/ngx_stream_ssl_module.h
-+++ b/src/stream/ngx_stream_ssl_module.h
-@@ -41,6 +41,7 @@
+--- nginx.orig/src/stream/ngx_stream_ssl_module.h
++++ nginx/src/stream/ngx_stream_ssl_module.h
+@@ -41,6 +41,7 @@ typedef struct {
      ngx_str_t        ecdh_curve;
      ngx_str_t        client_certificate;
      ngx_str_t        trusted_certificate;

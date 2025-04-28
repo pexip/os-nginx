@@ -1,10 +1,8 @@
-diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
-index 9699871..d9a3def 100644
---- a/src/event/ngx_event_openssl.c
-+++ b/src/event/ngx_event_openssl.c
-@@ -73,7 +73,12 @@ static void ngx_ssl_session_rbtree_insert_value(ngx_rbtree_node_t *temp,
+--- nginx.orig/src/event/ngx_event_openssl.c
++++ nginx/src/event/ngx_event_openssl.c
+@@ -70,7 +70,12 @@ static void ngx_ssl_session_rbtree_inser
  #ifdef SSL_CTRL_SET_TLSEXT_TICKET_KEY_CB
- static int ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
+ static int ngx_ssl_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
      unsigned char *name, unsigned char *iv, EVP_CIPHER_CTX *ectx,
 -    HMAC_CTX *hctx, int enc);
 +#if OPENSSL_VERSION_NUMBER < 0x30000000L
@@ -13,16 +11,15 @@ index 9699871..d9a3def 100644
 +    EVP_MAC_CTX *hctx,
 +#endif
 +    int enc);
- static void ngx_ssl_session_ticket_keys_cleanup(void *data);
+ static ngx_int_t ngx_ssl_rotate_ticket_keys(SSL_CTX *ssl_ctx, ngx_log_t *log);
+ static void ngx_ssl_ticket_keys_cleanup(void *data);
  #endif
- 
-@@ -4339,9 +4344,15 @@ ngx_ssl_session_ticket_keys(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_array_t *paths)
+@@ -4543,8 +4548,14 @@ ngx_ssl_session_ticket_keys(ngx_conf_t *
          return NGX_ERROR;
      }
  
 +#if OPENSSL_VERSION_NUMBER < 0x30000000L
-     if (SSL_CTX_set_tlsext_ticket_key_cb(ssl->ctx,
-                                          ngx_ssl_session_ticket_key_callback)
+     if (SSL_CTX_set_tlsext_ticket_key_cb(ssl->ctx, ngx_ssl_ticket_key_callback)
          == 0)
 +#else
 +    if (SSL_CTX_set_tlsext_ticket_key_evp_cb(ssl->ctx,
@@ -32,9 +29,9 @@ index 9699871..d9a3def 100644
      {
          ngx_log_error(NGX_LOG_WARN, cf->log, 0,
                        "nginx was built with Session Tickets support, however, "
-@@ -4368,7 +4379,12 @@ failed:
+@@ -4665,7 +4676,12 @@ failed:
  static int
- ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
+ ngx_ssl_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
      unsigned char *name, unsigned char *iv, EVP_CIPHER_CTX *ectx,
 -    HMAC_CTX *hctx, int enc)
 +#if OPENSSL_VERSION_NUMBER < 0x30000000L
@@ -44,21 +41,23 @@ index 9699871..d9a3def 100644
 +#endif
 +    int enc)
  {
-     size_t                         size;
-     SSL_CTX                       *ssl_ctx;
-@@ -4376,17 +4392,26 @@ ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
-     ngx_array_t                   *keys;
-     ngx_connection_t              *c;
-     ngx_ssl_session_ticket_key_t  *key;
+     size_t                 size;
+     SSL_CTX               *ssl_ctx;
+@@ -4673,7 +4689,11 @@ ngx_ssl_ticket_key_callback(ngx_ssl_conn
+     ngx_array_t           *keys;
+     ngx_connection_t      *c;
+     ngx_ssl_ticket_key_t  *key;
 +#if OPENSSL_VERSION_NUMBER < 0x30000000L
-     const EVP_MD                  *digest;
+     const EVP_MD          *digest;
 +#else
-+    OSSL_PARAM                     params[2];
++    OSSL_PARAM             params[2];
 +#endif
-     const EVP_CIPHER              *cipher;
+     const EVP_CIPHER      *cipher;
  
      c = ngx_ssl_get_connection(ssl_conn);
-     ssl_ctx = c->ssl->session_ctx;
+@@ -4683,11 +4703,16 @@ ngx_ssl_ticket_key_callback(ngx_ssl_conn
+         return -1;
+     }
  
 +#if OPENSSL_VERSION_NUMBER < 0x30000000L
  #ifdef OPENSSL_NO_SHA256
@@ -71,9 +70,9 @@ index 9699871..d9a3def 100644
 +    params[1] = OSSL_PARAM_construct_end();
 +#endif
  
-     keys = SSL_CTX_get_ex_data(ssl_ctx, ngx_ssl_session_ticket_keys_index);
+     keys = SSL_CTX_get_ex_data(ssl_ctx, ngx_ssl_ticket_keys_index);
      if (keys == NULL) {
-@@ -4423,7 +4448,12 @@ ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
+@@ -4724,7 +4749,12 @@ ngx_ssl_ticket_key_callback(ngx_ssl_conn
              return -1;
          }
  
@@ -87,7 +86,7 @@ index 9699871..d9a3def 100644
          if (HMAC_Init_ex(hctx, key[0].hmac_key, size, digest, NULL) != 1) {
              ngx_ssl_error(NGX_LOG_ALERT, c->log, 0, "HMAC_Init_ex() failed");
              return -1;
-@@ -4466,7 +4496,12 @@ ngx_ssl_session_ticket_key_callback(ngx_ssl_conn_t *ssl_conn,
+@@ -4767,7 +4797,12 @@ ngx_ssl_ticket_key_callback(ngx_ssl_conn
              size = 32;
          }
  
