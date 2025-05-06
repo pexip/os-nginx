@@ -100,3 +100,14 @@
          if (HMAC_Init_ex(hctx, key[i].hmac_key, size, digest, NULL) != 1) {
              ngx_ssl_error(NGX_LOG_ALERT, c->log, 0, "HMAC_Init_ex() failed");
              return -1;
+--- a/src/event/quic/ngx_event_quic_protection.c
++++ b/src/event/quic/ngx_event_quic_protection.c
+@@ -510,7 +510,7 @@ ngx_quic_crypto_common(ngx_quic_secret_t *s, ngx_str_t *out, u_char *nonce,
+         }
+     }
+ 
+-    if (EVP_CIPHER_mode(EVP_CIPHER_CTX_cipher(ctx)) == EVP_CIPH_CCM_MODE
++    if (EVP_CIPHER_CTX_get_mode(ctx) == EVP_CIPH_CCM_MODE
+         && EVP_CipherUpdate(ctx, NULL, &len, NULL, in->len) != 1)
+     {
+         ngx_ssl_error(NGX_LOG_INFO, log, 0, "EVP_CipherUpdate() failed");

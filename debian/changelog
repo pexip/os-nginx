@@ -1,3 +1,10 @@
+nginx (1.26.3-2+pexip25u3) pexip-trixie; urgency=medium
+
+  * d/p/openssl3-deprecations: fix deprecated use of `EVP_CIPHER_CTX_cipher` in
+    src/event/quic/ngx_event_quic_protection.c
+
+ -- Huw Jones <huw@pexip.com>  Tue, 06 May 2025 14:31:08 +0100
+
 nginx (1.26.3-2+pexip25u2) pexip-trixie; urgency=medium
 
   * d/p/pexip-add-ssl_*_ca_path: use correct mod_stream config struct
