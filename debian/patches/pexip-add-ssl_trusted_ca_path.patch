@@ -405,7 +405,7 @@ Subject: [PATCH] add ssl_trusted_ca_path
 +      NGX_STREAM_MAIN_CONF|NGX_STREAM_SRV_CONF|NGX_CONF_TAKE1,
 +      ngx_conf_set_str_slot,
 +      NGX_STREAM_SRV_CONF_OFFSET,
-+      offsetof(ngx_stream_ssl_conf_t, trusted_ca_path),
++      offsetof(ngx_stream_ssl_srv_conf_t, trusted_ca_path),
 +      NULL },
 +
      { ngx_string("ssl_prefer_server_ciphers"),
