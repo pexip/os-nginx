@@ -1,7 +1,22 @@
+nginx (1.26.3-3) unstable; urgency=medium
+
+  [ Jan Mojžíš ]
+  * d/changelog: fix whitespace in 1.26.3-2 record
+  * d/control: add libnginx-mod-http-lua dependency for nginx-extras package
+    for riscv64 platform
+
+  [ Thomas Ward ]
+  * d/nginx-common.nginx.service: Add ConditionFileIsExecutable to 
+    SystemD service file, prevents starting of service if nginx is
+    not installed (which can happen if nginx-common is installed 
+    independently from `nginx` itself (Closes: #1098477)
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Thu, 15 May 2025 15:31:38 +0200
+
 nginx (1.26.3-2) unstable; urgency=medium
 
   * Team upload
-  * Upload to unstable 
+  * Upload to unstable
 
  -- Jérémy Lal <kapouer@melix.org>  Fri, 07 Feb 2025 12:53:11 +0100
 
