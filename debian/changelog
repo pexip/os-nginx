@@ -1,3 +1,18 @@
+nginx (1.22.1-9+pexip24u7+deb12u2) pexip; urgency=medium
+
+  * New upstream release
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Mon, 19 May 2025 12:35:33 +0000
+
+nginx (1.22.1-9+deb12u2) bookworm; urgency=medium
+
+  * Non-maintainer upload by the LTS Team.
+  * Add upstream patches for CVE-2024-7347:
+    - mp4: fix buffer underread while updating stsz atom
+    - mp4: reject unordered chunks in stsc atom
+
+ -- Andrej Shadura <andrewsh@debian.org>  Wed, 12 Mar 2025 18:55:08 +0100
+
 nginx (1.22.1-9+pexip24u6+deb12u1) pexip; urgency=medium
 
   * New upstream release
