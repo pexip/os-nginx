@@ -1,3 +1,9 @@
+nginx (1.26.3-3+pexip25u1) pexip-trixie; urgency=medium
+
+  * New upstream release
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 31 Jul 2025 14:08:01 +0100
+
 nginx (1.26.3-3) unstable; urgency=medium
 
   [ Jan Mojžíš ]
