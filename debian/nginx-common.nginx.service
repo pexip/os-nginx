@@ -15,6 +15,7 @@ Description=A high performance web server and a reverse proxy server
 Documentation=man:nginx(8)
 After=network-online.target remote-fs.target nss-lookup.target
 Wants=network-online.target
+ConditionFileIsExecutable=/usr/sbin/nginx
 
 [Service]
 Type=forking
