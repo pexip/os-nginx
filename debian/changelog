@@ -1,3 +1,10 @@
+nginx (1.26.3-3+deb13u1) trixie; urgency=medium
+
+  * d/p/CVE-2025-53859.patch add, fix potential information leak
+    in ngx_mail_smtp_module (CVE-2025-53859).
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Fri, 29 Aug 2025 16:10:13 +0200
+
 nginx (1.26.3-3) unstable; urgency=medium
 
   [ Jan Mojžíš ]
