@@ -1,14 +1,8 @@
-nginx (1.26.3-3+pexip25u1+pexip25u1) pexip-trixie; urgency=medium
+nginx (1.26.3-3+deb13u1+pexip25u1) pexip-trixie; urgency=medium
 
   * New upstream release
 
  -- Mark Hymers <mark.hymers@pexip.com>  Wed, 05 Nov 2025 11:03:02 +0000
-
-nginx (1.26.3-3+pexip25u1) pexip-trixie; urgency=medium
-
-  * New upstream release
-
- -- Mark Hymers <mark.hymers@pexip.com>  Thu, 31 Jul 2025 14:08:01 +0100
 
 nginx (1.26.3-3+deb13u1) trixie; urgency=medium
 
@@ -16,6 +10,12 @@ nginx (1.26.3-3+deb13u1) trixie; urgency=medium
     in ngx_mail_smtp_module (CVE-2025-53859).
 
  -- Jan Mojžíš <janmojzis@debian.org>  Fri, 29 Aug 2025 16:10:13 +0200
+
+nginx (1.26.3-3+pexip25u1) pexip-trixie; urgency=medium
+
+  * New upstream release
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 31 Jul 2025 14:08:01 +0100
 
 nginx (1.26.3-3) unstable; urgency=medium
 
