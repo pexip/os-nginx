@@ -41,10 +41,8 @@ Architecture: any
 Depends: ${misc:Depends},
          ${shlibs:Depends},
          iproute2,
-         nginx (<< ${source:Version}.1~),
-         nginx (>= ${source:Version}),
-Breaks: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~),
-Replaces: nginx-light (<< 1.22.1-6~), nginx-extras (<< 1.22.1-6~), nginx-core (<< 1.22.1-6~)
+         nginx-common (= ${source:Version}),
+Conflicts: nginx
 Suggests: fcgiwrap, nginx-doc, ssl-cert
 Provides: httpd, httpd-cgi, ${nginx:abi}
 Description: nginx web/proxy server (basic version)
