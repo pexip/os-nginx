@@ -1,3 +1,13 @@
+nginx (1.26.3-3+deb13u2) trixie-security; urgency=medium
+
+  * d/p/CVE-2026-1642: backport upstream patch for CVE-2026-1642.
+    Fixes problem when an attacker with a man-in-the-middle position on the
+    upstream server side—along with conditions beyond the attacker's
+    control—may be able to inject plain text data into the response
+    from an upstream proxied server.
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Tue, 10 Feb 2026 07:47:34 +0100
+
 nginx (1.26.3-3+deb13u1) trixie; urgency=medium
 
   * d/p/CVE-2025-53859.patch add, fix potential information leak
