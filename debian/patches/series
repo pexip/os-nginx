@@ -10,3 +10,4 @@ pexip-add-ssl_trusted_ca_path.patch
 pexip-add-ssl_client_ca_path.patch
 openssl3-deprecations.patch
 CVE-2025-53859.patch
+CVE-2026-1642.patch

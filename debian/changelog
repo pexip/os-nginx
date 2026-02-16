@@ -1,3 +1,19 @@
+nginx (1.22.1-9+pexip24u9+deb12u4) pexip; urgency=medium
+
+  * New upstream release with security fix
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Mon, 16 Feb 2026 11:41:43 +0000
+
+nginx (1.22.1-9+deb12u4) bookworm-security; urgency=medium
+
+  * d/p/CVE-2026-1642: backport upstream patch for CVE-2026-1642.
+    Fixes problem when an attacker with a man-in-the-middle position on the
+    upstream server side—along with conditions beyond the attacker's
+    control—may be able to inject plain text data into the response
+    from an upstream proxied server.
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Tue, 10 Feb 2026 08:11:19 +0100
+
 nginx (1.22.1-9+pexip24u8+deb12u3) pexip; urgency=medium
 
   * New upstream release with security fix
