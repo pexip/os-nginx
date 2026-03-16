@@ -1,3 +1,19 @@
+nginx (1.26.3-3+deb13u2+pexip25u1) pexip-trixie; urgency=medium
+
+  * New upstream release with security fix
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Mon, 16 Mar 2026 17:31:06 +0000
+
+nginx (1.26.3-3+deb13u2) trixie-security; urgency=medium
+
+  * d/p/CVE-2026-1642: backport upstream patch for CVE-2026-1642.
+    Fixes problem when an attacker with a man-in-the-middle position on the
+    upstream server side—along with conditions beyond the attacker's
+    control—may be able to inject plain text data into the response
+    from an upstream proxied server.
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Tue, 10 Feb 2026 07:47:34 +0100
+
 nginx (1.26.3-3+deb13u1+pexip25u3) pexip-trixie; urgency=medium
 
   * Fix/re-sync nginx-pexip packaging
