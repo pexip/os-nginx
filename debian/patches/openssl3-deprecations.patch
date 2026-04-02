@@ -1,3 +1,4 @@
+Patch to only use non-deprecated APIs when OpenSSL3 is in use
 --- nginx.orig/src/event/ngx_event_openssl.c
 +++ nginx/src/event/ngx_event_openssl.c
 @@ -70,7 +70,12 @@ static void ngx_ssl_session_rbtree_inser
