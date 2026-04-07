@@ -1,3 +1,5 @@
+ngx_http_ssl: add ssl_client_ca_path config option.
+Directory analogue of ssl_client_certificate to verify mTLS clients.
 --- nginx.orig/src/http/modules/ngx_http_ssl_module.c
 +++ nginx/src/http/modules/ngx_http_ssl_module.c
 @@ -171,6 +171,13 @@ static ngx_command_t  ngx_http_ssl_comma

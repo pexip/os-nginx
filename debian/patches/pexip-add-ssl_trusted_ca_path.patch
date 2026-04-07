@@ -1,22 +1,6 @@
-From 198cdf8b2d9ac08840a84ab53ae387862789b97e Mon Sep 17 00:00:00 2001
-From: Huw Jones <huw@pexip.com>
-Date: Thu, 26 May 2022 10:43:14 +0000
-Subject: [PATCH] add ssl_trusted_ca_path
-
----
- src/event/ngx_event_openssl.c                   |  4 ++--
- src/event/ngx_event_openssl.h                   |  2 +-
- src/http/modules/ngx_http_grpc_module.c         | 16 ++++++++++++++--
- src/http/modules/ngx_http_proxy_module.c        | 16 ++++++++++++++--
- src/http/modules/ngx_http_ssl_module.c          |  8 ++++++++
- src/http/modules/ngx_http_ssl_module.h          |  1 +
- src/http/modules/ngx_http_uwsgi_module.c        | 15 +++++++++++++--
- src/mail/ngx_mail_ssl_module.c                  | 12 ++++++++++++
- src/mail/ngx_mail_ssl_module.h                  |  1 +
- src/stream/ngx_stream_proxy_module.c            | 17 +++++++++++++++--
- src/stream/ngx_stream_ssl_module.c              |  8 ++++++++
- src/stream/ngx_stream_ssl_module.h              |  1 +
-
+ngx_http_ssl: add ssl_trusted_ca_path config option.
+Directory analogue of ssl_trusted_certificate to verify mTLS clients.
+Certs will not be sent to the client.
 --- nginx.orig/src/event/ngx_event_openssl.c
 +++ nginx/src/event/ngx_event_openssl.c
 @@ -949,27 +949,28 @@ ngx_ssl_client_certificate(ngx_conf_t *c
