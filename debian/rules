@@ -98,6 +98,7 @@ pexip_configure_flags  := \
 			--with-threads \
 			--with-http_gunzip_module \
 			--with-http_gzip_static_module \
+			--with-http_sub_module \
 			--without-http_ssi_module \
 			--without-http_userid_module \
 			--without-http_auth_basic_module \
