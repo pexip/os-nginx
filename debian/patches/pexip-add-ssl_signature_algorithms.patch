@@ -1,0 +1,141 @@
+ngx_http_ssl+ngx_stream_ssl: add ssl_signature_algorithms option
+diff --git a/src/event/ngx_event_openssl.c b/src/event/ngx_event_openssl.c
+index f10e387..5a2c089 100644
+--- a/src/event/ngx_event_openssl.c
++++ b/src/event/ngx_event_openssl.c
+@@ -904,6 +904,23 @@ ngx_ssl_ciphers(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *ciphers,
+ }
+ 
+ 
++ngx_int_t
++ngx_ssl_sig_algs(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *sig_algs)
++{
++    if (sig_algs->len == 0) {
++        return NGX_OK;
++    }
++    if (SSL_CTX_set1_sigalgs_list(ssl->ctx, (char *) sig_algs->data) == 0) {
++        ngx_ssl_error(NGX_LOG_EMERG, ssl->log, 0,
++                      "SSL_set1_sigalgs_list(\"%V\") failed",
++                      sig_algs);
++        return NGX_ERROR;
++    }
++
++    return NGX_OK;
++}
++
++
+ static ngx_int_t
+ ssl_tree_noop(ngx_tree_ctx_t *ctx, ngx_str_t *path)
+ {
+diff --git a/src/event/ngx_event_openssl.h b/src/event/ngx_event_openssl.h
+index 0352510..bdb36c7 100644
+--- a/src/event/ngx_event_openssl.h
++++ b/src/event/ngx_event_openssl.h
+@@ -200,6 +200,7 @@ ngx_int_t ngx_ssl_connection_certificate(ngx_connection_t *c, ngx_pool_t *pool,
+ 
+ ngx_int_t ngx_ssl_ciphers(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *ciphers,
+     ngx_uint_t prefer_server_ciphers);
++ngx_int_t ngx_ssl_sig_algs(ngx_conf_t *cf, ngx_ssl_t *ssl, ngx_str_t *sig_algs);
+ ngx_int_t ngx_ssl_client_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl,
+     ngx_str_t *cert, ngx_str_t *ca_path, ngx_int_t depth);
+ ngx_int_t ngx_ssl_trusted_certificate(ngx_conf_t *cf, ngx_ssl_t *ssl,
+diff --git a/src/http/modules/ngx_http_ssl_module.c b/src/http/modules/ngx_http_ssl_module.c
+index 0c1aed8..901136f 100644
+--- a/src/http/modules/ngx_http_ssl_module.c
++++ b/src/http/modules/ngx_http_ssl_module.c
+@@ -143,6 +143,13 @@ static ngx_command_t  ngx_http_ssl_commands[] = {
+       offsetof(ngx_http_ssl_srv_conf_t, ciphers),
+       NULL },
+ 
++    { ngx_string("ssl_signature_algorithms"),
++      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_TAKE1,
++      ngx_conf_set_str_slot,
++      NGX_HTTP_SRV_CONF_OFFSET,
++      offsetof(ngx_http_ssl_srv_conf_t, sig_algs),
++      NULL },
++
+     { ngx_string("ssl_buffer_size"),
+       NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_CONF_TAKE1,
+       ngx_conf_set_size_slot,
+@@ -699,6 +706,7 @@ ngx_http_ssl_merge_srv_conf(ngx_conf_t *cf, void *parent, void *child)
+                          NGX_DEFAULT_ECDH_CURVE);
+ 
+     ngx_conf_merge_str_value(conf->ciphers, prev->ciphers, NGX_DEFAULT_CIPHERS);
++    ngx_conf_merge_str_value(conf->sig_algs, prev->sig_algs, "");
+ 
+     ngx_conf_merge_ptr_value(conf->conf_commands, prev->conf_commands, NULL);
+ 
+@@ -770,6 +778,11 @@ ngx_http_ssl_merge_srv_conf(ngx_conf_t *cf, void *parent, void *child)
+         return NGX_CONF_ERROR;
+     }
+ 
++    if (ngx_ssl_sig_algs(cf, &conf->ssl, &conf->sig_algs) != NGX_OK)
++    {
++        return NGX_CONF_ERROR;
++    }
++
+     if (ngx_http_ssl_compile_certificates(cf, conf) != NGX_OK) {
+         return NGX_CONF_ERROR;
+     }
+diff --git a/src/http/modules/ngx_http_ssl_module.h b/src/http/modules/ngx_http_ssl_module.h
+index d1f97d0..1d734d6 100644
+--- a/src/http/modules/ngx_http_ssl_module.h
++++ b/src/http/modules/ngx_http_ssl_module.h
+@@ -47,6 +47,7 @@ typedef struct {
+     ngx_str_t                       crl;
+ 
+     ngx_str_t                       ciphers;
++    ngx_str_t                       sig_algs;
+ 
+     ngx_array_t                    *passwords;
+     ngx_array_t                    *conf_commands;
+diff --git a/src/stream/ngx_stream_ssl_module.c b/src/stream/ngx_stream_ssl_module.c
+index cea53e8..8c55713 100644
+--- a/src/stream/ngx_stream_ssl_module.c
++++ b/src/stream/ngx_stream_ssl_module.c
+@@ -142,6 +142,13 @@ static ngx_command_t  ngx_stream_ssl_commands[] = {
+       offsetof(ngx_stream_ssl_srv_conf_t, ciphers),
+       NULL },
+ 
++    { ngx_string("ssl_signature_algorithms"),
++      NGX_STREAM_MAIN_CONF|NGX_STREAM_SRV_CONF|NGX_CONF_TAKE1,
++      ngx_conf_set_str_slot,
++      NGX_STREAM_SRV_CONF_OFFSET,
++      offsetof(ngx_stream_ssl_srv_conf_t, sig_algs),
++      NULL },
++
+     { ngx_string("ssl_verify_client"),
+       NGX_STREAM_MAIN_CONF|NGX_STREAM_SRV_CONF|NGX_CONF_TAKE1,
+       ngx_conf_set_enum_slot,
+@@ -882,6 +889,7 @@ ngx_stream_ssl_merge_srv_conf(ngx_conf_t *cf, void *parent, void *child)
+                          NGX_DEFAULT_ECDH_CURVE);
+ 
+     ngx_conf_merge_str_value(conf->ciphers, prev->ciphers, NGX_DEFAULT_CIPHERS);
++    ngx_conf_merge_str_value(conf->sig_algs, prev->sig_algs, "");
+ 
+     ngx_conf_merge_ptr_value(conf->conf_commands, prev->conf_commands, NULL);
+ 
+@@ -937,6 +945,11 @@ ngx_stream_ssl_merge_srv_conf(ngx_conf_t *cf, void *parent, void *child)
+         return NGX_CONF_ERROR;
+     }
+ 
++    if (ngx_ssl_sig_algs(cf, &conf->ssl, &conf->sig_algs) != NGX_OK)
++    {
++        return NGX_CONF_ERROR;
++    }
++
+     if (ngx_stream_ssl_compile_certificates(cf, conf) != NGX_OK) {
+         return NGX_CONF_ERROR;
+     }
+diff --git a/src/stream/ngx_stream_ssl_module.h b/src/stream/ngx_stream_ssl_module.h
+index 1aa0afd..c81668e 100644
+--- a/src/stream/ngx_stream_ssl_module.h
++++ b/src/stream/ngx_stream_ssl_module.h
+@@ -47,6 +47,7 @@ typedef struct {
+     ngx_str_t        alpn;
+ 
+     ngx_str_t        ciphers;
++    ngx_str_t        sig_algs;
+ 
+     ngx_array_t     *passwords;
+     ngx_array_t     *conf_commands;
