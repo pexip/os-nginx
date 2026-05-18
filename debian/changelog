@@ -1,3 +1,51 @@
+nginx (1.26.3-3+deb13u5) trixie-security; urgency=medium
+
+  * backport changes from upstream nginx, HTTP/3 address spoofing
+    (CVE-2026-40460), buffer overflow in the ngx_http_rewrite_module
+    (CVE-2026-42945), buffer overread in the ngx_http_scgi_module and
+    ngx_http_uwsgi_module (CVE-2026-42946), resolver use-after-free in OCSP
+    (CVE-2026-40701), buffer overread in the ngx_http_charset_module
+    (CVE-2026-42934)
+    * d/p/CVE-2026-40460.patch add
+    * d/p/CVE-2026-42945.patch add
+    * d/p/CVE-2026-42946.patch add
+    * d/p/CVE-2026-40701.patch add
+    * d/p/CVE-2026-42934.patch add
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Fri, 15 May 2026 14:13:33 +0000
+
+nginx (1.26.3-3+deb13u4) trixie; urgency=medium
+
+  * d/conf/*_params: use "$host" instead of "$http_host"
+    * "$http_host" forwards the Host header exactly as supplied by the client
+      and may not match the effective request target (e.g. absolute-form
+      requests with a conflicting Host header)
+      this can expose inconsistent or attacker-controlled host values to
+      backend applications (uwsgi, fastcgi, scgi, proxy)
+    * switch to "$host" as a safer, normalized alternative
+    * note: this changes behaviour, as "$host" does not preserve the
+      client-supplied port; deployments relying on "$http_host" including
+      a port number may be affected
+    * it is workaround for Debian bug #1126960 for stable/oldstable release
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Mon, 20 Apr 2026 17:52:06 +0000
+
+nginx (1.26.3-3+deb13u3) trixie; urgency=medium
+
+  * backport changes from upstream nginx, fixes for buffer overflow
+    vulnerability in the ngx_http_dav_module (CVE-2026-27654), buffer overflow
+    vulnerabilities in the ngx_http_mp4_module (CVE-2026-27784, CVE-2026-32647),
+    mail session authentication vulnerabilities (CVE-2026-27651, CVE-2026-28753)
+    and OCSP result bypass vulnerability in stream (CVE-2026-28755)
+    * d/p/CVE-2026-27651.patch add
+    * d/p/CVE-2026-27654.patch add
+    * d/p/CVE-2026-27784.patch add
+    * d/p/CVE-2026-28753.patch add
+    * d/p/CVE-2026-28755.patch add
+    * d/p/CVE-2026-32647.patch add
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Mon, 30 Mar 2026 17:41:51 +0000
+
 nginx (1.26.3-3+deb13u2+pexip25u4) pexip-trixie; urgency=medium
 
   * d/p: add ssl_signature_algorithms option to mod_http_ssl and mod_stream_ssl.

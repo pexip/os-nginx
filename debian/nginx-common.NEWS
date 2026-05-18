@@ -1,3 +1,19 @@
+nginx (1.26.3-3+deb13u4) UNRELEASED; urgency=medium
+
+  * d/conf/*_params: use "$host" instead of "$http_host"
+    * "$http_host" forwards the Host header exactly as supplied by the client
+      and may not match the effective request target (e.g. absolute-form
+      requests with a conflicting Host header)
+      this can expose inconsistent or attacker-controlled host values to
+      backend applications (uwsgi, fastcgi, scgi, proxy)
+    * switch to "$host" as a safer, normalized alternative
+    * note: this changes behaviour, as "$host" does not preserve the
+      client-supplied port; deployments relying on "$http_host" including
+      a port number may be affected
+    * it is workaround for Debian bug #1126960 for stable/oldstable release
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Mon, 20 Apr 2026 17:52:06 +0000
+
 nginx-common (1.10.2-4) unstable; urgency=medium
 
   Since nginx 1.9.14 Debian has gradually switched to dynamic loadable modules
