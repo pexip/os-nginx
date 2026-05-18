@@ -106,7 +106,7 @@ nginx (1.26.3-3+deb13u1) trixie; urgency=medium
 
  -- Jan Mojžíš <janmojzis@debian.org>  Fri, 29 Aug 2025 16:10:13 +0200
 
-nginx (1.26.3-3+pexip25u1) pexip-trixie; urgency=medium
+nginx (1.26.3-3+deb13u0+pexip25u1) pexip-trixie; urgency=medium
 
   * New upstream release
 
