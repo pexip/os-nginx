@@ -1,3 +1,9 @@
+nginx (1.26.3-3+deb13u5+pexip25u2) pexip-trixie; urgency=medium
+
+  * d/p: add patch for "HTTP/2 bomb" attack
+
+ -- Huw Jones <huw@pexip.com>  Fri, 5 Jun 2026 12:26:33 +0100
+
 nginx (1.26.3-3+deb13u5+pexip25u1) pexip-trixie; urgency=medium
 
   * New upstream release
