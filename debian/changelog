@@ -1,3 +1,26 @@
+nginx (1.26.3-3+deb13u6) trixie-security; urgency=medium
+
+  * Apply both patches to fix CVE-2026-42946. In the previous version,
+    only one part of the patch was applied, so the fix was incomplete.
+    This really fixes CVE-2026-42946, thanks to charles@debian.org for
+    pointing it out.
+    * d/p/CVE-2026-42946.patch rename to d/p/CVE-2026-42946.2.patch
+    * d/p/CVE-2026-42946.1.patch add
+  * backport fix for buffer overflow vulnerability in the
+    ngx_http_rewrite_module (CVE-2026-9256) from upstream 1.30.2 nginx.
+    * d/p/CVE-2026-9256.patch add
+  * backport max_headers directive from upstream nginx. It limits the number
+    of request headers accepted from clients. Fixes remote denial-of-service
+    exploit.
+    And move max_headers from core module to the ngx_http_header_count_module
+    to avoid potential ABI breakage and keep all the 3rd party modules
+    compatible with the new version of nginx without recompilation.
+    A big thanks to Miao Wang for preparing the modification.
+    Fixes TEMP-1138794-BADE22.
+    * d/p/FIX-HTTP2bomb.patch add
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Fri, 05 Jun 2026 12:22:02 +0000
+
 nginx (1.26.3-3+deb13u5) trixie-security; urgency=medium
 
   * backport changes from upstream nginx, HTTP/3 address spoofing
