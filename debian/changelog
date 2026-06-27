@@ -1,3 +1,13 @@
+nginx (1.26.3-3+deb13u7) trixie-security; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * Upstream: limit header length for HTTP/2 and gRPC (CVE-2026-42055)
+    (Closes: #1140359)
+  * Charset: fixed another rare buffer overread in recode_from_utf8()
+    (CVE-2026-48142) (Closes: #1140361)
+
+ -- Salvatore Bonaccorso <carnil@debian.org>  Sat, 27 Jun 2026 22:33:06 +0200
+
 nginx (1.26.3-3+deb13u6) trixie-security; urgency=medium
 
   * Apply both patches to fix CVE-2026-42946. In the previous version,
