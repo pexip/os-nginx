@@ -21,3 +21,5 @@ openssl3-deprecations.patch
 pexip-add-ssl_signature_algorithms.patch
 CVE-2026-9256.patch
 FIX-HTTP2bomb.patch
+Upstream-limit-header-length-for-HTTP-2-and-gRPC.patch
+Charset-fixed-another-rare-buffer-overread-in-recode.patch
