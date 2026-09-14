@@ -23,3 +23,6 @@ CVE-2026-9256.patch
 FIX-HTTP2bomb.patch
 Upstream-limit-header-length-for-HTTP-2-and-gRPC.patch
 Charset-fixed-another-rare-buffer-overread-in-recode.patch
+CVE-2026-56434.patch
+CVE-2026-60005.patch
+CVE-2026-42533.patch

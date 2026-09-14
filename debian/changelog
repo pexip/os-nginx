@@ -1,3 +1,23 @@
+nginx (1.26.3-3+deb13u8+pexip25u1) pexip-trixie; urgency=medium
+
+  * New upstream release with security fixes
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Thu, 14 Sep 2026 11:55:50 +0100
+
+nginx (1.26.3-3+deb13u8) trixie-security; urgency=medium
+
+  * d/t/abicheck add, detect unintended API changes in the nginx-dev
+    package by comparing header files with previous version
+  * d/p/CVE-2026-56434.patch add, backport fix for use-after-free when using
+    ngx_http_ssi_module (CVE-2026-56434)
+  * d/p/CVE-2026-60005.patch add, backport fix for memory disclosure
+    vulnerability when using ngx_http_slice_module (CVE-2026-60005)
+  * d/p/CVE-2026-42533.patch add, backport fix for buffer overflow
+    vulnerability when using map with regex (CVE-2026-42533)
+    A big thanks to Aron Xu for preparing the patch.
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Fri, 04 Sep 2026 17:02:15 +0000
+
 nginx (1.26.3-3+deb13u7+pexip25u1) pexip-trixie; urgency=medium
 
   * New upstream release with security fixes

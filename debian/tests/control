@@ -149,3 +149,7 @@ Depends: nginx-light, curl
 Tests: ssi-module-test
 Restrictions: allow-stderr, isolation-container, needs-root,
 Depends: nginx, nginx-core, curl
+
+Tests: abicheck
+Restrictions: allow-stderr skippable
+Depends: nginx-dev
