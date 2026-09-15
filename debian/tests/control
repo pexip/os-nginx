@@ -153,3 +153,7 @@ Depends: nginx, nginx-core, curl
 Tests: abicheck
 Restrictions: allow-stderr skippable
 Depends: nginx-dev
+
+Tests: nginx-dev-test.sh
+Restrictions: allow-stderr
+Depends: nginx-dev, build-essential

@@ -1,3 +1,12 @@
+nginx (1.26.3-3+deb13u9) trixie-security; urgency=medium
+  * d/p/CVE-2026-42533.patch update: keep private script headers out of
+    auto/modules' ngx_module_deps so third-party modules can be built
+    against nginx-dev. (Closes: #1147527)
+  * d/t/nginx-dev-test.sh add, verify that nginx-dev can build and load
+    a minimal third-party dynamic HTTP module.
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Tue, 15 Sep 2026 09:28:28 +0000
+
 nginx (1.26.3-3+deb13u8) trixie-security; urgency=medium
 
   * d/t/abicheck add, detect unintended API changes in the nginx-dev
