@@ -22,3 +22,8 @@ Charset-fixed-another-rare-buffer-overread-in-recode.patch
 CVE-2026-56434.patch
 CVE-2026-60005.patch
 CVE-2026-42533.patch
+CVE-2026-15176.patch
+CVE-2026-93479.patch
+CVE-2026-95101.patch
+CVE-2026-97629.patch
+CVE-2026-97205.patch

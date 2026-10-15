@@ -1,3 +1,20 @@
+nginx (1.26.3-3+deb13u10) trixie-security; urgency=high
+
+  * Backport security fixes from upstream 1.30.6:
+    - d/p/CVE-2026-15176.patch: reject URI to path mapping with alias
+      after a rewrite changed the URI.
+    - d/p/CVE-2026-93479.patch: protect reserved memory when evaluating
+      string expressions in HTTP and stream modules, adapting the fix
+      to the existing ABI-preserving script backport.
+    - d/p/CVE-2026-95101.patch: keep skipped HTTP/3 frame payload separate
+      from request body data, preserving nginx-dev ABI compatibility.
+    - d/p/CVE-2026-97629.patch: initialize all worker session ticket keys
+      during key rotation.
+    - d/p/CVE-2026-97205.patch: limit pending asynchronous operations
+      to prevent the request blocked counter from overflowing.
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Thu, 15 Oct 2026 01:08:48 +0000
+
 nginx (1.26.3-3+deb13u9) trixie-security; urgency=medium
   * d/p/CVE-2026-42533.patch update: keep private script headers out of
     auto/modules' ngx_module_deps so third-party modules can be built
