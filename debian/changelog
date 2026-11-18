@@ -1,3 +1,33 @@
+nginx (1.26.3-3+deb13u11+pexip25u1) pexip-trixie; urgency=medium
+
+  * New upstream release with security fixes
+
+ -- Steve McIntyre <steve.mcintyre@pexip.com>  Wed, 18 Nov 2026 22:17:25 +0000
+
+nginx (1.26.3-3+deb13u11) trixie-security; urgency=high
+
+  * Backport security fixes from upstream 1.30.7:
+    - d/p/CVE-2026-123633.patch: keep HTTP/2 connections with active streams
+      out of the reusable connection queue.
+    - d/p/CVE-2026-123640.patch: validate ClientHello extensions in
+      ngx_stream_ssl_preread_module.
+    - d/p/CVE-2026-120967.patch: verify stream client certificates using
+      the server configuration selected by SNI.
+    - d/p/CVE-2026-118899.patch: handle NGX_AGAIN explicitly while reading
+      HTTP request bodies.
+    - d/p/CVE-2026-123634.patch: defer freeing detached resolver contexts
+      until their callbacks run.
+    - d/p/CVE-2026-123007.patch: include queued DATA in HTTP/2 flow control
+      checks, preserving nginx-dev ABI compatibility.
+    - d/p/CVE-2026-113425.patch: prevent mail sessions from being freed
+      while authentication, upstream setup or SMTP resolution is pending.
+    - d/p/CVE-2026-121810.patch: keep a QUIC connection active while
+      allocating a connection slot for a new stream.
+    - d/p/CVE-2026-125283.patch: use the actual script output length when
+      stripping an alias prefix in try_files.
+
+ -- Jan Mojžíš <janmojzis@debian.org>  Wed, 18 Nov 2026 17:29:52 +0000
+
 nginx (1.26.3-3+deb13u10+pexip25u1) pexip-trixie; urgency=medium
 
   * New upstream release with security fixes
